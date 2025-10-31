@@ -17,20 +17,20 @@ export default async function AdminLayout({
 
   return (
     <div>
-      <header className="container">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <nav className="flex items-center gap-5 text-sm">
-            <a href="/admin" className="hover:opacity-80">
+      <header>
+        <div className="container">
+          <nav >
+            <a href="/admin">
               Дашборд
             </a>
-            <a href="/admin/casinos" className="hover:opacity-80">
+            <a href="/admin/casinos">
               Казино
             </a>
-            <a href="/admin/articles" className="hover:opacity-80">
+            <a href="/admin/articles">
               Статьи
             </a>
           </nav>
-          <a href="/api/auth/signout" className="text-sm hover:opacity-80">
+          <a href="/api/auth/signout" >
             Выйти
           </a>
         </div>

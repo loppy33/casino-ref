@@ -22,7 +22,7 @@ export default async function AdminPage() {
   const s = await getStats();
 
   return (
-    <div className="container">
+    <div className="AdminPage container">
       <h1>Админ-панель</h1>
 
       {/* Карточки-метрики */}
@@ -48,7 +48,7 @@ export default async function AdminPage() {
       {/* Быстрые ссылки */}
       <div>
         <h2>Разделы</h2>
-        <div className="flex flex-wrap gap-3">
+        <div className="links">
           <a href="/admin/casinos">
             Управление казино
           </a>
