@@ -1,0 +1,105 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Category {
+  id       String     @id @default(cuid())
+  slug     String     @unique
+  name     String
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  // обратные стороны M2M
+  casinos  Casino[]  @relation("CasinoCategories")
+  articles Article[] @relation("ArticleCategories")
+
+  createdAt DateTime @default(now())
+}
+
+model Casino {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  name       String
+  rating     Int?
+  license    String?
+  minDeposit Int?
+  is18plus   Boolean  @default(true)
+  logoUrl    String?
+  shortDesc  String?
+  pros       String[] // text[] в Postgres
+  cons       String[] // text[] в Postgres
+
+  links AffiliateLink[]
+
+  // M2M с категориями (обе стороны должны быть)
+  categories Category[] @relation("CasinoCategories")
+
+  // обратная сторона для Click.casino
+  clicks Click[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AffiliateLink {
+  id          String  @id @default(cuid())
+  casinoId    String
+  network     String
+  baseUrl     String
+  subTemplate String?
+  isPrimary   Boolean @default(true)
+
+  casino Casino @relation(fields: [casinoId], references: [id])
+
+  // обратная сторона для Click.link
+  clicks Click[]
+}
+
+model Article {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  title     String
+  bodyMd    String
+  published Boolean @default(false)
+
+  // M2M с категориями (обе стороны должны быть)
+  categories Category[] @relation("ArticleCategories")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Click {
+  id        String   @id
+  casinoId  String
+  linkId    String
+  source    String?
+  gclid     String?
+  gbraid    String?
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  casino Casino        @relation(fields: [casinoId], references: [id])
+  link   AffiliateLink @relation(fields: [linkId], references: [id])
+}
