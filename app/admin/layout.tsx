@@ -16,8 +16,8 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen  text-white">
-      <header className="border-b border-white/10">
+    <div>
+      <header className="container">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
           <nav className="flex items-center gap-5 text-sm">
             <a href="/admin" className="hover:opacity-80">
@@ -36,7 +36,7 @@ export default async function AdminLayout({
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }

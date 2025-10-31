@@ -7,15 +7,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>
-                <header className="container">
-                    header
-                </header>
-                <main>{children}</main>
-                <footer className="container">
-                    footer
-                </footer>
-            </body>
+            <body>{children}</body>
         </html>
     );
 }

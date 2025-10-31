@@ -16,13 +16,15 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="container">
-            <form onSubmit={handleSubmit}>
-                <h2>Вход в админку</h2>
-                <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
-                <input type="password" placeholder="Пароль" onChange={(e) => setPassword(e.target.value)} required />
-                {error && <p className="text-red-600">{error}</p>}
-                <button>Войти</button>
+        <div className="FormPage container">
+            <form className="base__form" onSubmit={handleSubmit}>
+                <h2>Админ панель</h2>
+                <input className="main__input" type="text" placeholder="Логин" onChange={(e) => {setEmail(e.target.value); setError("")}} required />
+                <input className="main__input" type="password" placeholder="Пароль" onChange={(e) => {setPassword(e.target.value); setError("")}} required />
+                <div>
+                    {error && <p className="error">{error}</p>}
+                    <button>Войти</button>
+                </div>
             </form>
         </div>
     );

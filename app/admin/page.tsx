@@ -22,40 +22,40 @@ export default async function AdminPage() {
   const s = await getStats();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Админ-панель</h1>
+    <div className="container">
+      <h1>Админ-панель</h1>
 
       {/* Карточки-метрики */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-xl border p-4">
-          <div className="text-sm text-gray-500">Клики (24ч)</div>
-          <div className="text-2xl font-bold">{s.clicks24h}</div>
+      <div className="cards">
+        <div className="content">
+          <h3>Клики (24ч)</h3>
+          <p>{s.clicks24h}</p>
         </div>
-        <div className="rounded-xl border p-4">
-          <div className="text-sm text-gray-500">Клики (30д)</div>
-          <div className="text-2xl font-bold">{s.clicks30d}</div>
+        <div className="content">
+          <h3>Клики (30д)</h3>
+          <p>{s.clicks30d}</p>
         </div>
-        <div className="rounded-xl border p-4">
-          <div className="text-sm text-gray-500">Казино</div>
-          <div className="text-2xl font-bold">{s.casinos}</div>
+        <div className="content">
+          <h3>Казино</h3>
+          <p>{s.casinos}</p>
         </div>
-        <div className="rounded-xl border p-4">
-          <div className="text-sm text-gray-500">Статьи</div>
-          <div className="text-2xl font-bold">{s.articles}</div>
+        <div className="content">
+          <h3>Статьи</h3>
+          <p>{s.articles}</p>
         </div>
       </div>
 
       {/* Быстрые ссылки */}
-      <div className="rounded-xl border p-4">
-        <h2 className="text-lg font-medium mb-3">Разделы</h2>
+      <div>
+        <h2>Разделы</h2>
         <div className="flex flex-wrap gap-3">
-          <a href="/admin/casinos" className="px-3 py-2 rounded-lg border hover:bg-gray-50">
+          <a href="/admin/casinos">
             Управление казино
           </a>
-          <a href="/admin/articles" className="px-3 py-2 rounded-lg border hover:bg-gray-50">
+          <a href="/admin/articles">
             Статьи и обзоры
           </a>
-          <a href="/admin/clicks" className="px-3 py-2 rounded-lg border hover:bg-gray-50">
+          <a href="/admin/clicks">
             Логи кликов
           </a>
         </div>
