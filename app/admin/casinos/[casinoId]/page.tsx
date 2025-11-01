@@ -1,0 +1,108 @@
+// app/admin/casinos/[id]/page.tsx
+import { prisma } from "@/lib/db";
+import { deleteLink, updateCasino } from "../actions";
+
+export default async function EditCasino({ params }: { params: { casinoId: string } }) {
+    const { casinoId } = await params;     // 👈 распаковали
+
+    const [casino, categories] = await Promise.all([
+        prisma.casino.findUnique({
+            where: { id: casinoId },           // 👈 теперь не undefined
+            include: { categories: true, links: true },
+        }),
+        prisma.category.findMany({ orderBy: { name: "asc" } }),
+    ]);
+
+    if (!casino) return <div className="container">Не найдено</div>;
+
+    const selected = new Set(
+        casino.categories.map((c: (typeof casino.categories)[number]) => c.id)
+    );
+
+    return (
+        <div className="container">
+            <form action={updateCasino} className="base__form">
+                <h2>Редактировать казино</h2>
+                <input type="hidden" name="id" defaultValue={casino.id} />
+                <input name="name" defaultValue={casino.name} required />
+                <input name="slug" defaultValue={casino.slug} required />
+                <input name="license" defaultValue={casino.license || ""} />
+                <input name="logoUrl" defaultValue={casino.logoUrl || ""} />
+                <input name="rating" type="number" min={0} max={100} defaultValue={casino.rating ?? ""} />
+                <input name="minDeposit" type="number" min={0} defaultValue={casino.minDeposit ?? ""} />
+                <label className="checkbox">
+                    <input type="checkbox" name="is18plus" defaultChecked={casino.is18plus} /> Только 18+
+                </label>
+                <textarea name="shortDesc" defaultValue={casino.shortDesc || ""} />
+
+                <div className="grid-2">
+                    <div>
+                        <label>Плюсы</label>
+                        <textarea name="pros" rows={6} defaultValue={(casino.pros || []).join("\n")} />
+                    </div>
+                    <div>
+                        <label>Минусы</label>
+                        <textarea name="cons" rows={6} defaultValue={(casino.cons || []).join("\n")} />
+                    </div>
+                </div>
+
+                <fieldset>
+                    <legend>Категории</legend>
+                    <div className="checkbox-list">
+                        {categories.map((cat: (typeof categories)[number]) => (
+                            <label key={cat.id} className="checkbox">
+                                <input
+                                    type="checkbox"
+                                    name="categoryIds"
+                                    value={cat.id}
+                                    defaultChecked={selected.has(cat.id)}
+                                />
+                                {cat.name}
+                            </label>
+                        ))}
+                    </div>
+                </fieldset>
+
+                <button className="primary__btn">Сохранить</button>
+            </form>
+
+            <section className="mt-4">
+                <h3>Партнёрские ссылки</h3>
+                <a className="link__btn" href={`/admin/casinos/links/new/${casino.id}`}>+ Добавить ссылку</a>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Сеть</th>
+                            <th>URL</th>
+                            <th>subTemplate</th>
+                            <th>primary</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {casino.links.map((l: (typeof casino.links)[number]) => (
+                            <tr key={l.id}>
+                                <td>
+                                    <a href={`/admin/casinos/links/${l.id}`}>{l.network}</a>
+                                </td>
+                                <td className="truncate">{l.baseUrl}</td>
+                                <td className="truncate">{l.subTemplate || "-"}</td>
+                                <td>{l.isPrimary ? "✓" : ""}</td>
+                                <td className="ta-right">
+                                    <form
+                                        action={async () => {
+                                            "use server";
+                                            await deleteLink(l.id, casino.id);
+                                        }}
+                                    >
+                                        <button className="danger__btn">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    );
+}
