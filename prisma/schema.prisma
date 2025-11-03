@@ -26,7 +26,7 @@ model Category {
   slug     String     @unique
   name     String
   parentId String?
-  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryHierarchy")
 
   // обратные стороны M2M
@@ -69,7 +69,7 @@ model AffiliateLink {
   subTemplate String?
   isPrimary   Boolean @default(true)
 
-  casino Casino @relation(fields: [casinoId], references: [id])
+  casino Casino @relation(fields: [casinoId], references: [id], onDelete: Cascade)
 
   // обратная сторона для Click.link
   clicks Click[]
@@ -100,6 +100,6 @@ model Click {
   userAgent String?
   createdAt DateTime @default(now())
 
-  casino Casino        @relation(fields: [casinoId], references: [id])
-  link   AffiliateLink @relation(fields: [linkId], references: [id])
+  casino Casino        @relation(fields: [casinoId], references: [id], onDelete: Cascade)
+  link   AffiliateLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }

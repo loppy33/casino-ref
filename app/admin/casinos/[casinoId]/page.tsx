@@ -20,7 +20,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
     );
 
     return (
-        <div className="container">
+        <div className="FormPage container">
             <form action={updateCasino} className="base__form">
                 <h2>Редактировать казино</h2>
                 <input type="hidden" name="id" defaultValue={casino.id} />
@@ -67,8 +67,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
             </form>
 
             <section className="mt-4">
-                <h3>Партнёрские ссылки</h3>
-                <a className="link__btn" href={`/admin/casinos/links/new/${casino.id}`}>+ Добавить ссылку</a>
+                <h3>Партнёрские ссылки <a className="link__btn" href={`/admin/casinos/${casino.id}/links/new`}>+ Добавить ссылку</a></h3>
                 <table className="table">
                     <thead>
                         <tr>
@@ -83,7 +82,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                         {casino.links.map((l: (typeof casino.links)[number]) => (
                             <tr key={l.id}>
                                 <td>
-                                    <a href={`/admin/casinos/links/${l.id}`}>{l.network}</a>
+                                    <a href={`/admin/casinos/${casinoId}/links/${l.id}`}>{l.network}</a>
                                 </td>
                                 <td className="truncate">{l.baseUrl}</td>
                                 <td className="truncate">{l.subTemplate || "-"}</td>

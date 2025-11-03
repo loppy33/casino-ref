@@ -1,9 +1,37 @@
 header
     .container
-        padding: 1rem
         display: flex
         justify-content: space-between
-        
+        align-items: center
+        padding: 1rem 0
         nav
             display: flex
             gap: 1rem
+    &.site__header
+        position: absolute
+        top: 0
+        left: 0
+        width: 100%
+        display: flex
+        justify-content: space-between
+
+        .ad
+            opacity: .9
+            width: 100%
+            padding: .3rem
+            backdrop-filter: blur(3px)
+            display: flex
+            align-items: center
+            justify-content: center
+            flex-wrap: wrap
+            gap: .2rem
+
+            font-size: .8rem
+
+            img
+                width: 1.9rem
+
+            a
+                color: var(--content-bg-color)
+
+

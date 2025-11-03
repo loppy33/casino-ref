@@ -1,0 +1,67 @@
+.table
+    width: 100%
+    border-collapse: collapse
+    margin-top: 1.5rem
+    font-size: 0.95rem
+    background: var(--content-bg-color)
+    border-radius: 12px
+    overflow: hidden
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35)
+
+    thead
+        background: var(--main-bg-color)
+        text-align: left
+
+        th
+            padding: 0.75rem 1rem
+            font-weight: 600
+            color: var(--main-text-color)
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05)
+            white-space: nowrap
+
+    tbody
+        tr
+            transition: background 0.15s ease
+
+            &:nth-child(even)
+                background: #1c1c1e
+
+            &:hover
+                background: rgba(0, 117, 255, 0.08)
+
+        td
+            padding: 0.7rem 1rem
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05)
+            color: var(--sec-text-color)
+            vertical-align: middle
+
+            a
+                color: var(--main-color)
+                text-decoration: none
+                font-weight: 500
+
+                &:hover
+                    text-decoration: underline
+
+            &.ta-right
+                text-align: right
+
+            &.truncate
+                max-width: 240px
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+
+// Кнопки внутри таблицы
+.danger__btn
+    background: var(--red-color)
+    color: var(--white-color)
+    border: none
+    padding: 0.4rem 0.8rem
+    font-size: 0.9rem
+    border-radius: 6px
+    cursor: pointer
+    transition: background 0.15s ease
+
+    &:hover
+        background: var(--sec-red-color)

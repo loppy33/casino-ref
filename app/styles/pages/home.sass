@@ -1,0 +1,131 @@
+.Home
+    .home-hero__title
+        font-size: clamp(30px, 5vw, 50px)
+        color: var(--main-text-color)
+        margin: 0 0 8px
+        padding-top: 50vh
+        span
+            color: var(--main-color)
+
+    .home-hero__subtitle
+        color: var(--sec-text-color)
+        margin-bottom: 16px
+
+    .home-search
+        display: flex
+        gap: 8px
+        margin: 14px 0 18px
+
+    .home-hero__stats
+        display: grid
+        grid-template-columns: repeat(3, minmax(0,1fr))
+        gap: 10px
+        margin-top: 8px
+        .stat
+            background: var(--content-bg-color)
+            border-radius: 12px
+            padding: 12px
+            text-align: center
+        &__num
+            font-size: 20px
+            color: var(--main-text-color)
+        &__label
+            color: var(--sec-text-color)
+            font-size: .9rem
+
+    .home-section
+        margin-top: 24px
+
+    .section-head
+        display: flex
+        align-items: baseline
+        justify-content: space-between
+        margin-bottom: 12px
+        h2
+            margin: 0
+            color: var(--main-text-color)
+        &__link
+            color: var(--links-text-color)
+            text-decoration: none
+
+    .cat-grid
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
+        gap: 10px
+    .cat-card
+        display: flex
+        align-items: center
+        gap: 10px
+        background: var(--content-bg-color)
+        border-radius: 12px
+        padding: 12px
+        text-decoration: none
+        color: var(--main-text-color)
+        &:hover  
+            filter: brightness(1.05)
+        &__dot
+            width: 10px
+            height: 10px
+            border-radius: 50%
+            background: var(--main-color)
+        &__name
+            flex: 1
+        &__count
+            color: var(--sec-text-color)
+
+    .casino-grid
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))
+        gap: 12px
+    .casino-card
+        background: var(--content-bg-color)
+        border-radius: 14px
+        padding: 14px
+        &__top
+            display: flex
+            gap: 10px
+            align-items: center
+
+        &__logo svg
+            opacity: .8
+
+        &__title
+            margin: 0
+
+        &__rating
+            color: var(--sec-text-color)
+            font-size: .9rem
+        &__desc
+            color: var(--sec-text-color)
+            margin: 8px 0 12px
+        &__actions
+            display: flex
+            gap: 8px
+    .btn
+        padding: 10px 12px
+        border-radius: 10px
+        text-decoration: none
+        &--primary
+            background: var(--main-color)
+            color: var(--white-color)
+        &--ghost
+            background: transparent
+            color: var(--main-text-color)
+            border: 1px solid rgba(255,255,255,.12)
+
+    .article-grid
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))
+        gap: 12px
+        
+    .article-card
+        background: var(--content-bg-color)
+        border-radius: 12px
+        padding: 14px
+        &__title
+            margin: 0 0 8px
+        &__excerpt
+            color: var(--sec-text-color)
+        &__more
+            color: var(--links-text-color)
+            text-decoration: none

@@ -29,12 +29,7 @@ export default async function AdminPage() {
 
   return (
     <div className="AdminPage container">
-      <header className="admin-header">
-        <h1>Админ-панель</h1>
-        <p className="subtitle">Управление контентом и партнёрскими ссылками сайта</p>
-      </header>
-
-      {/* Метрики */}
+      <h1>Обзор</h1>
       <section className="cards">
         <div className="content">
           <div className="card-header">
@@ -68,22 +63,6 @@ export default async function AdminPage() {
           <p className="stat">{s.articles}</p>
         </div>
       </section>
-
-      {/* Быстрые ссылки */}
-      <section className="quick-links">
-        <h2>Разделы</h2>
-        <div className="links">
-          <a href="/admin/casinos" className="link__btn">Управление казино</a>
-          <a href="/admin/categories" className="link__btn">Категории</a>
-          <a href="/admin/articles" className="link__btn">Статьи и обзоры</a>
-          <a href="/admin/clicks" className="link__btn">Логи кликов</a>
-        </div>
-      </section>
-
-      <footer className="admin-footer">
-        <AlertTriangle size={14} />
-        <span>Данные обновлены {new Date().toLocaleString("ru-RU")}</span>
-      </footer>
     </div>
   );
 }

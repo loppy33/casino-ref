@@ -10,8 +10,8 @@ export default async function CasinosPage() {
 
     return (
         <div className="CasinoPage container">
-            <h1>Казино</h1>
-            <a href="/admin/casinos/new" className="link__btn">+ Добавить</a>
+            <h1>Казино <a href="/admin/casinos/new" className="link__btn">+ Добавить</a></h1>
+            
 
             <table className="table">
                 <thead>
@@ -35,9 +35,6 @@ export default async function CasinosPage() {
                             <td>{c.categories.map((k: (typeof c.categories)[number]) => k.name).join(", ")}</td>
                             <td>{c.links.length}</td>
                             <td className="ta-right">
-                                <a href={`/admin/casinos/${c.id}`} className="link__btn">
-                                    Ред.
-                                </a>
                                 <form
                                     action={async () => {
                                         "use server";

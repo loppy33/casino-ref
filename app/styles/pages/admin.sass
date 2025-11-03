@@ -1,18 +1,37 @@
 .FormPage
     display: flex
+    align-items: flex-start
     justify-content: center
-    align-items: center
-    min-height: 100vh
+    gap: 32px
+    padding: 20px
+
+    h3
+        display: flex
+        align-items: center
+        justify-content: space-between
+
     form
-        margin: auto
+        flex: 1
+        max-width: 480px
+
+    section
+        flex: 1
+        max-width: 700px
 
 .CasinoPage
-    .link__btn
-        display: block
-        max-width: fit-content
-        margin-top: 2rem
+    h1
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 1rem 0
+        
+        .link__btn
+            max-width: fit-content
 
 .AdminPage
+    h1
+        margin-bottom: 1rem
+
     .links
         display: flex
         gap: 1rem

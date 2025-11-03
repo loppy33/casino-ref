@@ -1,9 +1,9 @@
-input, textarea
-    font:  sans-serif
+input, textarea, .input
+    font: sans-serif
     border: none
     outline: none
-    padding: 1rem  
-    border-radius: .8rem  
+    padding: 1rem
+    border-radius: .8rem
 
     background: var(--input-bg-color)
     color: var(--main-bg-color)
@@ -15,8 +15,10 @@ input, textarea
 
     &::placeholder
         color: var(--sec-text-color)
-    
+
 button, .link__btn
+    display: block
+
     cursor: pointer
     border: none
 
@@ -30,4 +32,5 @@ button, .link__btn
     transition: .3s
 
     &:hover
-        opacity: .9
+        opacity: .7
+        color: var(--white-color)

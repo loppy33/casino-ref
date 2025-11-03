@@ -10,7 +10,7 @@ export default async function NewCategory() {
                 <h2>Новая категория</h2>
                 <input name="name" placeholder="Название" required />
                 <input name="slug" placeholder="slug" required />
-                <select name="parentId" defaultValue="">
+                <select className="input" name="parentId" defaultValue="">
                     <option value="">(без родителя)</option>
                     {parents.map((p: (typeof parents)[number]) => (
                         <option key={p.id} value={p.id}>{p.name}</option>

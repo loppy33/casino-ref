@@ -1,0 +1,52 @@
+$checkbox-bg: var(--main-color)
+$checkbox-check: #fff
+$checkbox-size: 20px
+$checkbox-radius: 3px
+
+.checkbox
+    display: inline-flex
+    align-items: center
+    gap: 6px
+    cursor: pointer
+    font-size: 14px
+    color: var(--sec-text-color)
+    user-select: none
+    padding: 0
+
+    input[type='checkbox']
+        padding: 0
+
+        /* Полный ресет нативного вида */
+        -webkit-appearance: none
+        -moz-appearance: none
+        appearance: none
+
+        width: $checkbox-size
+        height: $checkbox-size
+        flex-shrink: 0
+        border-radius: $checkbox-radius
+        background-color: rgba(255, 255, 255, 0.1)
+        border: 1px solid rgba(0, 0, 0, 0.15)
+        cursor: pointer
+        display: inline-flex
+        align-items: center
+        justify-content: center
+        position: relative
+        transition: all 0.15s ease
+
+        &:hover
+            border-color: var(--main-color)
+            background-color: rgba(255, 255, 255, 0.15)
+
+        &:checked
+            background-color: $checkbox-bg
+            border-color: transparent
+
+            &::after
+                content: ''
+                width: 4px
+                height: 8px
+                border-right: 2px solid $checkbox-check
+                border-bottom: 2px solid $checkbox-check
+                transform: rotate(45deg)
+                position: absolute

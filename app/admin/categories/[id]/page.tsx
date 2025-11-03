@@ -25,7 +25,7 @@ export default async function EditCategory({ params }: { params: { id: string } 
                 <input type="hidden" name="id" defaultValue={cat.id} />
                 <input name="name" defaultValue={cat.name} required />
                 <input name="slug" defaultValue={cat.slug} required />
-                <select name="parentId" defaultValue={cat.parentId || ""}>
+                <select className="input" name="parentId" defaultValue={cat.parentId || ""}>
                     <option value="">(без родителя)</option>
                     {parents
                         .filter((p: (typeof parents)[number]) => p.id !== cat.id)
