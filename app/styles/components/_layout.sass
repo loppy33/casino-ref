@@ -34,4 +34,81 @@ header
             a
                 color: var(--content-bg-color)
 
+.site-footer
+    background: var(--footer-bg-color)
+    border-top: 1px solid rgba(255,255,255,.08)
+    position: relative
+    padding-top: 3rem
+    margin-top: 4rem
+    font-size: .95rem
 
+    .footer__inner
+        display: flex
+        flex-wrap: wrap
+        justify-content: space-between
+        gap: 2rem
+        padding-bottom: 2.5rem
+
+    .footer__brand
+        flex: 1 1 280px
+        display: flex
+        gap: 1rem
+        .footer__logo img
+            width: 100px
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,.4))
+        .footer__desc
+            margin-top: 1rem
+            color: #a7a7b3
+            line-height: 1.5
+
+    .footer__nav
+        display: flex
+        gap: 3rem
+        flex: 1 1 300px
+        h4
+            color: var(--main-color)
+            font-weight: 700
+            font-size: 1rem
+            margin-bottom: .6rem
+        ul
+            list-style: none
+            margin: 0
+            padding: 0
+            display: flex
+            flex-direction: column
+            gap: .4rem
+        li
+            a
+                opacity: .85
+                transition: opacity .2s ease
+                &:hover
+                    opacity: 1
+                    color: var(--main-color)
+
+        .support-list
+            li
+                display: flex
+                align-items: center
+                gap: .25rem
+                font-size: .95rem
+                a
+                    color: var(--main-color)
+                    text-decoration: none
+                    &:hover
+                        text-decoration: underline
+
+    .footer__bottom
+        border-top: 1px solid rgba(255,255,255,.1)
+        padding: 1rem 0
+        text-align: center
+        font-size: .85rem
+        color: var(--sec-text-color)
+        background: radial-gradient(100% 80% at 50% 0, rgba(106, 181, 243, 0.05), transparent)
+
+@media (max-width: 1000px)
+    .footer__brand
+        flex: 1 1 50px !important
+
+    .footer__inner, .footer__nav
+        flex-direction: column
+        align-items: flex-start

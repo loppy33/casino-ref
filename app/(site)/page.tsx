@@ -13,7 +13,7 @@ export default async function Home() {
 			},
 		}),
 		prisma.category.findMany({
-			take: 6,
+			take: 4,
 			orderBy: { casinos: { _count: "desc" } }, // популярные по числу казино
 			include: { _count: { select: { casinos: true } } },
 		}),
@@ -99,7 +99,24 @@ export default async function Home() {
 												<a href={`/casinos/${c.slug}`}>{c.name}</a>
 											</h3>
 											<div className="casino-card__rating">
-												Note: <strong>{c.rating ?? 0}/100</strong>
+												<div className="stars">
+													{Array.from({ length: 5 }).map((_, i) => {
+														const filled = (c.rating ?? 0) / 20 > i;
+														return (
+															<svg
+																key={i}
+																width="18"
+																height="18"
+																viewBox="0 0 24 24"
+																fill={filled ? "#0075ff" : "#9aa1b1"} // жёлтая или серая звезда
+																xmlns="http://www.w3.org/2000/svg"
+															>
+																<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+															</svg>
+														);
+													})}
+												</div>
+												{/* Note: <strong>{c.rating ?? 0}/100</strong> */}
 											</div>
 										</div>
 									</div>
