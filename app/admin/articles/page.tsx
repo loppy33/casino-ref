@@ -8,7 +8,7 @@ export default async function ArticlesPage() {
         include: { categories: true },
     });
     return (
-        <div className="CasinoPage container">
+        <div className="AdminPage container">
             <h1>Статьи <a href="/admin/articles/new" className="link__btn">+ Добавить</a></h1>
             <table className="table">
                 <thead><tr><th>Заголовок</th><th>slug</th><th>Категории</th><th>Публ.</th><th></th></tr></thead>

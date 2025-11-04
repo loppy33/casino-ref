@@ -1,5 +1,6 @@
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
+import { mdToPlain } from "@/utils/mdToPlain";
 
 export default async function Home() {
 	// грузим всё параллельно
@@ -142,7 +143,7 @@ export default async function Home() {
 									<a href={`/articles/${a.slug}`}>{a.title}</a>
 								</h3>
 								<p className="article-card__excerpt">
-									{a.bodyMd.slice(0, 120)}{a.bodyMd.length > 120 ? "…" : ""}
+									{mdToPlain(a.bodyMd).slice(0, 120)}{a.bodyMd.length > 120 ? "…" : ""}
 								</p>
 								<a className="article-card__more" href={`/articles/${a.slug}`}>Lire →</a>
 							</article>

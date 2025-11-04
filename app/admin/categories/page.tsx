@@ -5,7 +5,7 @@ import { deleteCategory } from "./actions";
 export default async function CategoriesPage() {
     const cats = await prisma.category.findMany({ include: { parent: true }, orderBy: { name: "asc" } });
     return (
-        <div className="CasinoPage container">
+        <div className="AdminPage container">
             <h1>Категории <a className="link__btn" href="/admin/categories/new">+ Добавить</a></h1>
             
             <table className="table">

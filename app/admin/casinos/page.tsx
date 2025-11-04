@@ -9,7 +9,7 @@ export default async function CasinosPage() {
     });
 
     return (
-        <div className="CasinoPage container">
+        <div className="AdminPage container">
             <h1>Казино <a href="/admin/casinos/new" className="link__btn">+ Добавить</a></h1>
             
 

@@ -3,6 +3,7 @@ import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { mdToPlain } from "@/utils/mdToPlain";
 
 type ParamsP = Promise<{ slug?: string | string[] } | undefined>;
 const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v ?? "");
@@ -144,7 +145,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
                                     <a href={`/articles/${a.slug}`}>{a.title}</a>
                                 </h3>
                                 <p className="article-card__excerpt">
-                                    {stripMd(a.bodyMd).slice(0, 160)}{stripMd(a.bodyMd).length > 160 ? "…" : ""}
+                                    {mdToPlain(a.bodyMd).slice(0, 120).slice(0, 160)}{stripMd(a.bodyMd).length > 160 ? "…" : ""}
                                 </p>
                                 <a className="article-card__more" href={`/articles/${a.slug}`}>Lire →</a>
                             </article>
