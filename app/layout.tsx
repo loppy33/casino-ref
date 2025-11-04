@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./styles/index.sass";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
     title: "Casinos en ligne France — Bonus, Avis & Jeux Sécurisés",
     description:
@@ -21,13 +23,13 @@ export const metadata: Metadata = {
         title: "Top Casinos en ligne France — Bonus & Avis",
         description:
             "Sélection premium des meilleurs casinos français avec liens d’affiliation sûrs et bonus exclusifs.",
-        url: "http://localhost:3000/",
+        url: `${siteUrl}`,
         siteName: "Cazinoclub France",
         locale: "fr_FR",
         type: "website",
         images: [
             {
-                url: "http://localhost:3000/logo.png",
+                url: `${siteUrl}/logo.png`,
                 width: 1200,
                 height: 630,
                 alt: "Cazinoclub France — Top Casinos en Ligne",
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
         ],
     },
     alternates: {
-        canonical: "http://localhost:3000/",
+        canonical: `${siteUrl}`,
     },
     // manifest: "/manifest.webmanifest",
     icons: {

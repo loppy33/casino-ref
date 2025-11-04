@@ -1,14 +1,45 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
     return (
         <>
-            <header className="site__header">
-                <div className="ad">
+            <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
+                <div className="container site-header__inner">
+                    <a href="/" className="site-header__logo">
+                        <img src="/logo.png" alt="Cazinoclub France" />
+                    </a>
+
+                    <nav className="site-header__nav">
+                        <a href="/casinos">Casinos</a>
+                        <a href="/categories">Catégories</a>
+                        <a href="/articles">Articles</a>
+                        <a href="/faq">Faq</a>
+                    </nav>
+                </div>
+
+                <div className="site-header__age">
                     <img src="/age.png" alt="" />
-                    18 ans et plus. Jouez de manière responsable. Pour de l’aide, visitez{" "}
-                    <a target="_blank" href="https://BeGambleAware.org" rel="noopener noreferrer">
-                        BeGambleAware.org
-                    </a>{" "}
-                    ou appelez le <strong>0808 8020 133</strong>.
+                    <span>
+                        18 ans et plus. Jouez de manière responsable. Aide :{" "}
+                        <a
+                            target="_blank"
+                            href="https://BeGambleAware.org"
+                            rel="noopener noreferrer"
+                        >
+                            BeGambleAware.org
+                        </a>
+                    </span>
                 </div>
             </header>
 

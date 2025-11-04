@@ -1,0 +1,291 @@
+.CasinoPage
+    position: relative
+    color: var(--main-text-color)
+    padding-top: 50vh
+
+    .cp-hero
+        position: relative
+        z-index: 2
+        padding: 18vh 0 24px
+        &__top
+            display: grid
+            grid-template-columns: 140px 1fr
+            gap: 16px
+            align-items: center
+        @media (max-width: 640px)
+            grid-template-columns: 1fr
+        &__logo
+            width: 140px
+            height: 140px
+            border-radius: 16px
+            overflow: hidden
+            box-shadow: 0 8px 24px rgba(0,0,0,.25)
+            background: rgba(255,255,255,.04)
+            img
+                width: 100%
+                height: 100%
+                object-fit: cover
+        &__logo--placeholder
+            width: 140px
+            height: 140px
+            border-radius: 16px
+            background: rgba(255,255,255,.06)
+        &__meta
+            display: flex
+            flex-direction: column
+            gap: 10px
+        &__title
+            margin: 0
+            font-size: clamp(30px, 5vw, 42px)
+            color: var(--main-text-color)
+            span
+                color: var(--main-color)
+        &__subtitle
+            color: var(--sec-text-color)
+            max-width: 800px
+        &__chips
+            display: flex
+            gap: 8px
+            flex-wrap: wrap
+
+    .chip
+        background: var(--content-bg-color)
+        border: 1px solid rgba(255,255,255,.07)
+        color: var(--sec-text-color)
+        padding: 6px 10px
+        border-radius: 999px
+        font-size: .9rem
+        &--license
+            color: var(--white-color)
+            background: linear-gradient(0deg, rgba(0,0,0,.12), rgba(0,0,0,.12)), var(--main-color)
+        &--18plus
+            border-color: rgba(231, 76, 60, .35)
+            color: #ffb3b3
+
+    .cp-rating
+        display: inline-flex
+        align-items: center
+        gap: 6px
+        &__star
+            fill: #9aa1b1
+            transition: fill .2s ease
+            &.is-filled
+                fill: #0075ff
+        &__text
+            color: var(--sec-text-color)
+            font-size: .95rem
+
+    .cp-content
+        max-width: 1120px
+        margin: 20px auto 8px
+
+    .cp-grid
+        display: grid
+        grid-template-columns: minmax(0, 720px) 340px
+        align-items: start
+        gap: 16px
+        justify-content: center
+        @media (max-width: 1200px)
+            grid-template-columns: minmax(0, 640px) 320px
+        @media (max-width: 960px)
+            grid-template-columns: 1fr
+
+    .cp-card
+        background: var(--content-bg-color)
+        border-radius: 16px
+        padding: 16px
+        box-shadow: 0 8px 24px rgba(0,0,0,.16)
+        width: 100%
+
+    .cp-h2
+        margin: 0 0 10px
+        font-size: 1.4rem
+        color: var(--main-text-color)
+
+    .cp-h3
+        margin: 10px 0 8px
+        font-size: 1.1rem
+        &.good
+            color: #28a745
+        &.bad
+            color: #e74c3c
+
+    .cp-facts
+        list-style: none
+        margin: 0
+        padding: 0
+        li
+            display: grid
+            grid-template-columns: 180px 1fr
+            gap: 10px
+            padding: 10px 0
+            border-bottom: 1px solid rgba(255,255,255,.06)
+            &:last-child
+                border-bottom: 0
+            span
+                color: var(--sec-text-color)
+            b
+                color: var(--white-color)
+        .cp-cats
+            a
+                color: var(--links-text-color)
+                text-decoration: none
+                &:hover
+                    text-decoration: underline
+
+    .cp-list-block
+        margin-top: 10px
+
+    .cp-list
+        list-style: none
+        padding: 0
+        margin: 0
+        li
+            position: relative
+            padding-left: 20px
+            margin: 6px 0
+            &:before
+                content: ""
+                position: absolute
+                left: 0
+                top: 8px
+                width: 8px
+                height: 8px
+                border-radius: 2px
+                background: rgba(255,255,255,.25)
+        &--pros li:before
+            background: #28a745
+        &--cons li:before
+            background: #e74c3c
+
+    .cp-sticky
+        position: sticky
+        top: 20px
+        &__card
+            display: flex
+            flex-direction: column
+            align-items: center
+            gap: 10px
+            text-align: center
+            width: 100%
+            margin-left: auto
+            margin-right: auto
+        &__logo
+            width: 80px
+            height: 80px
+            border-radius: 12px
+            overflow: hidden
+            background: rgba(255,255,255,.06)
+            img
+                width: 100%
+                height: 100%
+                object-fit: cover
+            .ph
+                width: 100%
+                height: 100%
+                background: rgba(255,255,255,.05)
+        &__title
+            font-weight: 600
+        &__note
+            color: var(--sec-text-color)
+            font-size: .9rem
+
+    .btn-primary, .btn-ghost
+        padding: 10px 14px
+        border-radius: 12px
+        text-decoration: none
+        font-weight: 600
+        transition: filter .2s ease, background .2s ease, border-color .2s ease
+        display: inline-flex
+        align-items: center
+        justify-content: center
+
+    .btn-primary
+        background: var(--main-color)
+        color: var(--white-color)
+        &:hover
+            filter: brightness(1.08)
+
+    .btn-ghost
+        background: transparent
+        color: var(--main-text-color)
+        border: 1px solid rgba(255,255,255,.12)
+        &:hover
+            background: rgba(255,255,255,.06)
+
+    .btn-primary--wide, .btn-ghost--wide
+        width: 100%
+
+    .cp-similar
+        max-width: 1120px
+        margin: 24px auto 80px
+        &__head
+            display: flex
+            align-items: baseline
+            justify-content: space-between
+            margin-bottom: 10px
+        &__grid
+            display: grid
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
+            gap: 12px
+
+    .cp-sim-card
+        background: var(--content-bg-color)
+        border-radius: 14px
+        padding: 14px
+        display: flex
+        flex-direction: column
+        &__logo
+            width: 100%
+            aspect-ratio: 16/9
+            border-radius: 10px
+            overflow: hidden
+            background: rgba(255,255,255,.06)
+            margin-bottom: 10px
+            img
+                width: 100%
+                height: 100%
+                object-fit: cover
+            .ph
+                width: 100%
+                height: 100%
+                background: rgba(255,255,255,.04)
+        &__title
+            margin: 0 0 6px
+            a
+                color: var(--white-color)
+                text-decoration: none
+                &:hover
+                    text-decoration: underline
+        &__desc
+            color: var(--sec-text-color)
+            margin: 6px 0 10px
+            min-height: 36px
+        &__actions
+            margin-top: auto
+            display: flex
+            gap: 8px
+
+    .cp-empty
+        color: var(--sec-text-color)
+
+    .cp-mobile-cta
+        position: fixed
+        left: 0
+        right: 0
+        bottom: 12px
+        padding: 0 12px
+        display: none
+        z-index: 10
+        @media (max-width: 680px)
+            display: block
+        .btn-primary--full
+            width: 100%
+            padding: 14px
+            border-radius: 14px
+
+    .cp-link
+        color: var(--links-text-color)
+        text-decoration: none
+        &:hover
+            text-decoration: underline

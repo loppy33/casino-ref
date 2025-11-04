@@ -85,38 +85,31 @@ export default async function Home() {
 							const primary = c.links?.[0];
 							const ctaHref = primary ? `/out/${primary.id}?source=seo` : `/casinos/${c.slug}`;
 							return (
-								<article key={c.id} className="content">
-									<div className="">
-										<div className="casino-card__logo" aria-hidden>
-											{/* заглушка, если logoUrl есть — замени на <img src={c.logoUrl!} alt={c.name} /> */}
-											{/* <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
-												<rect x="3" y="3" width="18" height="18" rx="4" />
-											</svg> */}
-											<img src={c.logoUrl!} alt={c.name} />
-										</div>
-										<div className="casino-card__meta">
-											<h3 className="casino-card__title">
-												<a href={`/casinos/${c.slug}`}>{c.name}</a>
-											</h3>
-											<div className="casino-card__rating">
-												<div className="stars">
-													{Array.from({ length: 5 }).map((_, i) => {
-														const filled = (c.rating ?? 0) / 20 > i;
-														return (
-															<svg
-																key={i}
-																width="18"
-																height="18"
-																viewBox="0 0 24 24"
-																fill={filled ? "#0075ff" : "#9aa1b1"} // жёлтая или серая звезда
-																xmlns="http://www.w3.org/2000/svg"
-															>
-																<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-															</svg>
-														);
-													})}
-												</div>
-												{/* Note: <strong>{c.rating ?? 0}/100</strong> */}
+								<article key={c.id} className="content casino-card__container">
+									<div className="casino-card__logo" aria-hidden>
+										<img src={c.logoUrl!} alt={c.name} />
+									</div>
+									<div className="casino-card__meta">
+										<h3 className="casino-card__title">
+											<a href={`/casinos/${c.slug}`}>{c.name}</a>
+										</h3>
+										<div className="casino-card__rating">
+											<div className="stars">
+												{Array.from({ length: 5 }).map((_, i) => {
+													const filled = (c.rating ?? 0) / 20 > i;
+													return (
+														<svg
+															key={i}
+															width="18"
+															height="18"
+															viewBox="0 0 24 24"
+															fill={filled ? "#0075ff" : "#9aa1b1"}
+															xmlns="http://www.w3.org/2000/svg"
+														>
+															<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+														</svg>
+													);
+												})}
 											</div>
 										</div>
 									</div>
