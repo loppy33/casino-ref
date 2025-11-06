@@ -1,5 +1,6 @@
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
+import { mdToPlain } from "@/utils/mdToPlain";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -55,7 +56,7 @@ export default async function ArticlesPage() {
                                     <a href={`/articles/${a.slug}`}>{a.title}</a>
                                 </h3>
                                 <p className="article-card__excerpt">
-                                    {a.bodyMd.slice(0, 180)}
+                                    {mdToPlain(a.bodyMd).slice(0, 120)}
                                     {a.bodyMd.length > 180 ? "…" : ""}
                                 </p>
                                 <a className="article-card__more" href={`/articles/${a.slug}`}>

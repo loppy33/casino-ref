@@ -145,7 +145,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
                                     <a href={`/articles/${a.slug}`}>{a.title}</a>
                                 </h3>
                                 <p className="article-card__excerpt">
-                                    {mdToPlain(a.bodyMd).slice(0, 120).slice(0, 160)}{stripMd(a.bodyMd).length > 160 ? "…" : ""}
+                                    {mdToPlain(a.bodyMd).slice(0, 120)}{stripMd(a.bodyMd).length > 160 ? "…" : ""}
                                 </p>
                                 <a className="article-card__more" href={`/articles/${a.slug}`}>Lire →</a>
                             </article>

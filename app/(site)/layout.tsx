@@ -1,4 +1,5 @@
 "use client";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "NAME";
 
 import { useEffect, useState } from "react";
 
@@ -17,7 +18,8 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
             <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
                 <div className="container site-header__inner">
                     <a href="/" className="site-header__logo">
-                        <img src="/logo.png" alt="Cazinoclub France" />
+                        <img src="/logo.png"/>
+                        {siteName}
                     </a>
 
                     <nav className="site-header__nav">
@@ -31,7 +33,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                 <div className="site-header__age">
                     <img src="/age.png" alt="" />
                     <span>
-                        18 ans et plus. Jouez de manière responsable. Aide :{" "}
+                        18 ans et plus. Jouez de manière responsable. Aide:{" "}
                         <a
                             target="_blank"
                             href="https://BeGambleAware.org"
@@ -51,6 +53,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                     <div className="footer__brand">
                         <a href="/" className="footer__logo">
                             <img src="/logo.png" alt="Cazinoclub France" />
+
                         </a>
                         <p className="footer__desc">
                             Le guide premium des meilleurs casinos en ligne en France. Profitez
@@ -66,7 +69,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                                 <li><a href="/casinos">Casinos</a></li>
                                 <li><a href="/categories">Catégories</a></li>
                                 <li><a href="/articles">Articles</a></li>
-                                <li><a href="/contact">Contact</a></li>
+                                <li><a href="/faq">Faq</a></li>
                             </ul>
                         </div>
 
@@ -75,7 +78,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                             <ul>
                                 <li><a href="/mentions-legales">Mentions légales</a></li>
                                 <li><a href="/politique-confidentialite">Confidentialité</a></li>
-                                <li><a href="/cookies">Cookies</a></li>
                                 <li><a href="/responsable-jeu">Jeu responsable</a></li>
                             </ul>
                         </div>
