@@ -39,11 +39,11 @@ export default function ResponsableJeu() {
                         <h2>Aide et soutien</h2>
                         <p>
                             Si vous ressentez des difficultés liées au jeu, vous pouvez contacter des services d'aide :
-                            <ul>
-                                <li><a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener noreferrer">joueurs-info-service.fr</a></li>
-                                <li>Numéro d'assistance : 09 74 75 13 13 (appel non surtaxé)</li>
-                            </ul>
                         </p>
+                        <ul>
+                            <li><a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener noreferrer">joueurs-info-service.fr</a></li>
+                            <li>Numéro d'assistance : 09 74 75 13 13 (appel non surtaxé)</li>
+                        </ul>
                     </article>
 
                     <article className="card">
