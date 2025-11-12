@@ -1,0 +1,12 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Host
+Host: https://casinosearch.fr/
+
+# Sitemaps
+Sitemap: https://casinosearch.fr/sitemap.xml
+Sitemap: https://casinosearch.fr//sitemap.xml
