@@ -42,7 +42,7 @@ export default function FaqClient() {
     }, [filtered]);
 
     return (
-        <div className="FaqPro">
+        <div>
             <Bg />
 
             <section className="container faq-hero">
