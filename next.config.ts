@@ -5,6 +5,7 @@ const nextConfig = {
       {
         source: "/admin/:path*",
         destination: "/api/proxy/auth-proxy/:path*",
+        assetPrefix: process.env.NEXT_PUBLIC_URL
       },
     ];
   },
