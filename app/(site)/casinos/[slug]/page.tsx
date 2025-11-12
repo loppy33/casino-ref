@@ -3,42 +3,73 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-type ParamsP = Promise<{ slug?: string | string[] } | undefined>;
-const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v ?? "");
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+type ParamsP = { slug?: string  };
+const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
 
-// ── SEO: динамические метаданные
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
+
+// ── SEO: динамические метаданные для страницы казино
 export async function generateMetadata({ params }: { params: ParamsP }): Promise<Metadata> {
-    const p = (await params) ?? {};
-    const slug = first(p.slug);
+    const { slug } = params;
     if (!slug) return {};
 
     const casino = await prisma.casino.findUnique({
         where: { slug },
         include: { categories: true },
     });
-    if (!casino) return {};
+
+    if (!casino) {
+        return {
+            title: `Casino introuvable — ${siteName}`,
+            description: "Ce casino n’existe pas ou n’est plus disponible.",
+        };
+    }
 
     const title = `${casino.name} — avis, bonus et fiabilité`;
     const description =
         casino.shortDesc ||
-        `Découvrez ${casino.name} : avis, licence ${casino.license || "internationale"
-        }, dépôt minimum${casino.minDeposit ? ` ${casino.minDeposit}€` : ""} et sécurité.`;
+        `Découvrez ${casino.name} : avis, licence ${casino.license || "internationale"}, dépôt minimum${casino.minDeposit ? ` ${casino.minDeposit}€` : ""
+        } et sécurité. Jouez en toute confiance sur un site vérifié.`;
+
+    const ogImage = casino.logoUrl
+        ? [{ url: casino.logoUrl, width: 1200, height: 630, alt: casino.name }]
+        : [{ url: `${siteUrl}/logo.png`, width: 1200, height: 630, alt: siteName }];
+
+    const canonical = `${siteUrl}/casinos/${casino.slug}`;
 
     return {
         title,
         description,
+        keywords: [
+            casino.name,
+            "casino en ligne",
+            "bonus casino",
+            "casino France",
+            "jeux d’argent",
+            "machines à sous",
+            "blackjack en ligne",
+            ...(casino.categories?.map((c) => c.name.toLowerCase()) ?? []),
+        ],
         openGraph: {
             title,
             description,
             type: "website",
-            url: `${siteUrl}/casinos/${casino.slug}`,
-            images: casino.logoUrl ? [casino.logoUrl] : undefined,
+            url: canonical,
+            siteName,
+            locale: "fr_FR",
+            images: ogImage,
         },
-        alternates: { canonical: `${siteUrl}/casinos/${casino.slug}` },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: ogImage.map((i) => i.url),
+        },
+        alternates: { canonical },
+        robots: { index: true, follow: true },
     };
 }
-
 // ── Вспомогалка для звёзд
 function Stars({ rating100 = 0 }: { rating100?: number | null }) {
     const value = Math.max(0, Math.min(100, rating100 ?? 0));

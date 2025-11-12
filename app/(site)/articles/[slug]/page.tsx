@@ -7,7 +7,6 @@ import { mdToPlain } from "@/utils/mdToPlain";
 
 type ParamsP = Promise<{ slug?: string | string[] } | undefined>;
 const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v ?? "");
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 function stripMd(md: string) {
     return md
@@ -23,30 +22,42 @@ function readingTime(text: string) {
     return Math.max(1, Math.round(words / 180)); // ~180 wpm
 }
 
-export async function generateMetadata({ params }: { params: ParamsP }): Promise<Metadata> {
-    const p = (await params) ?? {};
-    const slug = first(p.slug);
-    if (!slug) return {};
-    const article = await prisma.article.findUnique({
-        where: { slug, published: true },
-        include: { categories: true },
-    });
-    if (!article) return {};
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
 
-    const plain = stripMd(article.bodyMd);
-    const desc = plain.slice(0, 160) + (plain.length > 160 ? "…" : "");
-    const title = `${article.title} — Guide & Analyse`;
+type Props = { params: { slug: string } };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = params;
+    const article = await prisma.article.findUnique({
+        where: { slug },
+        select: { title: true, bodyMd: true, published: true },
+    });
+
+    if (!article || !article.published) {
+        return {
+            title: "Article introuvable — Walixway",
+            description: "Cet article est introuvable ou n'est pas publié.",
+        };
+    }
+
+    const plain = mdToPlain(article.bodyMd).replace(/\s+/g, " ").trim();
+    const description = plain.slice(0, 160);
+    // OG image: используем лого по умолчанию или endpoint генерации OG
+    const ogImage = `${siteUrl}/api/og/article/${slug}`;
 
     return {
-        title,
-        description: desc,
+        title: `${article.title} — Walixway`,
+        description,
         openGraph: {
-            title,
-            description: desc,
+            title: article.title,
+            description,
+            url: `${siteUrl}/articles/${slug}`,
+            siteName,
             type: "article",
-            url: `${siteUrl}/articles/${article.slug}`,
+            images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
         },
-        alternates: { canonical: `${siteUrl}/articles/${article.slug}` },
+        alternates: { canonical: `${siteUrl}/articles/${slug}` },
     };
 }
 

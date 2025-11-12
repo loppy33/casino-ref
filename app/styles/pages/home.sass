@@ -85,23 +85,28 @@
             display: flex
             flex-direction: column
 
-        &__meta
-            display: flex
-            align-items: center
-            justify-content: space-between
+        // &__meta
+            // display: flex
+            // align-items: center
+            // justify-content: space-between
 
         &__top
             display: flex
             gap: 10px
             align-items: center
 
-        &__logo img
+        &__logo 
             width: 100%
-            height: 100%
-            border-radius: 10px
+            height: 200px
+            img
+                object-fit: cover
+                width: 100%
+                height: 100%
+                border-radius: 10px
 
         &__title
             margin: 0
+            margin-top: 1rem
             a
                 color: var(--white-color)
 

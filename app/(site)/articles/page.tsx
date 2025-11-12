@@ -4,22 +4,44 @@ import { mdToPlain } from "@/utils/mdToPlain";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
 
-export const metadata: Metadata = {
-    title: "Articles sur les casinos en ligne — France",
-    description:
-        "Découvrez nos articles sur les casinos en ligne : conseils, actualités, bonus, et stratégies pour jouer intelligemment et en toute sécurité.",
-    openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+    // Берём последний опубликованный article для более «свежего» OG-preview
+    const latest = await prisma.article.findFirst({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        select: { title: true, bodyMd: true, slug: true },
+    });
+
+    const defaultDesc =
+        "Découvrez nos articles sur les casinos en ligne : conseils, actualités, bonus, et stratégies pour jouer intelligemment et en toute sécurité.";
+
+    const description = latest ? mdToPlain(latest.bodyMd).slice(0, 160) : defaultDesc;
+    const ogImage = latest ? `${siteUrl}/api/og/article/${latest.slug}` : `${siteUrl}/logo.png`;
+    // Пример: можно иметь route для генерации OG-изображений /api/og/article/[slug]
+
+    return {
         title: "Articles sur les casinos en ligne — France",
-        description:
-            "Tous les articles sur les casinos en ligne vérifiés en France. Lisez nos analyses, guides et recommandations d'experts.",
-        type: "website",
-        url: `${siteUrl}/articles`,
-    },
-    alternates: {
-        canonical: `${siteUrl}/articles`,
-    },
-};
+        description,
+        openGraph: {
+            title: "Articles sur les casinos en ligne — France",
+            description,
+            url: `${siteUrl}/articles`,
+            siteName,
+            type: "website",
+            images: [
+                {
+                    url: ogImage,
+                    width: 1200,
+                    height: 630,
+                    alt: `${siteName} — Articles`,
+                },
+            ],
+        },
+        alternates: { canonical: `${siteUrl}/articles` },
+    };
+}
 
 export default async function ArticlesPage() {
     const articles = await prisma.article.findMany({

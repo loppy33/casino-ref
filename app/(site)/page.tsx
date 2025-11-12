@@ -8,7 +8,7 @@ export default async function Home() {
 		prisma.casino.findMany({
 			where: { rating: { not: null } },
 			orderBy: { rating: "desc" },
-			take: 6,
+			take: 4,
 			include: {
 				links: { where: { isPrimary: true }, take: 1 },
 			},
@@ -21,7 +21,7 @@ export default async function Home() {
 		prisma.article.findMany({
 			where: { published: true },
 			orderBy: { createdAt: "desc" },
-			take: 3,
+			take: 4,
 		}),
 	]);
 

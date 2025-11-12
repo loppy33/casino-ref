@@ -4,22 +4,52 @@ import { prisma } from "@/lib/db";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
 
-export const metadata: Metadata = {
-    title: "Tous les casinos en ligne — France vérifiés",
-    description:
-        "Découvrez tous les casinos en ligne vérifiés en France. Classement par note, bonus et fiabilité. Jouez sur des sites de confiance sélectionnés par nos experts.",
-    openGraph: {
-        title: "Tous les casinos en ligne — France vérifiés",
-        description:
-            "Liste complète des casinos en ligne en France, triés par note et fiabilité. Choisissez le meilleur site pour jouer en toute sécurité.",
-        type: "website",
-        url: `${siteUrl}/casinos`,
-    },
-    alternates: {
-        canonical: `${siteUrl}/casinos`,
-    },
-};
+export const revalidate = 60; // ISR: обновлять раз в минуту (опционально)
+
+export async function generateMetadata(): Promise<Metadata> {
+    // Берём топовый (по рейтингу) казино, чтобы сделать мета-описание более релевантным
+    const top = await prisma.casino.findFirst({
+        where: { rating: { not: null } },
+        orderBy: { rating: "desc" },
+        select: { name: true, shortDesc: true, slug: true, logoUrl: true },
+    });
+
+    const defaultTitle = "Tous les casinos en ligne — France vérifiés";
+    const defaultDesc =
+        "Découvrez tous les casinos en ligne vérifiés en France. Classement par note, bonus et fiabilité. Jouez sur des sites de confiance sélectionnés par nos experts.";
+    const description = top && top.shortDesc ? top.shortDesc : defaultDesc;
+    const ogImage = top?.logoUrl ? top.logoUrl : `${siteUrl}/logo.png`;
+    const url = `${siteUrl}/casinos`;
+
+    return {
+        title: defaultTitle,
+        description,
+        openGraph: {
+            title: defaultTitle,
+            description,
+            url,
+            siteName,
+            type: "website",
+            images: [
+                {
+                    url: ogImage,
+                    width: 1200,
+                    height: 630,
+                    alt: top ? `${top.name} — ${siteName}` : `${siteName} — Casinos`,
+                },
+            ],
+        },
+        alternates: {
+            canonical: url,
+        },
+        robots: {
+            index: true,
+            follow: true,
+        },
+    };
+}
 
 export default async function CasinosPage() {
     const casinos = await prisma.casino.findMany({

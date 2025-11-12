@@ -6,22 +6,33 @@ import { SECTIONS } from "./sections";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
 
-const metadata: Metadata = {
-    title: "FAQ — Casinos en ligne France",
-    description:
-        "Tout sur les casinos en ligne en France : sécurité, licences, bonus, retraits, KYC, limites, fiscalité et jeu responsable.",
-    openGraph: {
-        title: "FAQ — Casinos en ligne France",
-        description:
-            "Questions fréquentes sur la sécurité, les bonus, les retraits, le KYC et le jeu responsable.",
-        type: "website",
-        url: `${siteUrl}/faq`,
-    },
-    alternates: { canonical: `${siteUrl}/faq` },
-};
+export async function generateMetadata(): Promise<Metadata> {
 
+    const ogImage = `${siteUrl}/logo.png`;
 
+    return {
+        title: `FAQ — ${siteName}`,
+        description: "FAQ sur les casinos en ligne en France : tout savoir sur la sécurité, les licences, les bonus, les retraits, le KYC et le jeu responsable.",
+        openGraph: {
+            title: `FAQ — ${siteName}`,
+            description: "Questions fréquentes sur la sécurité, les bonus, les retraits, le KYC et le jeu responsable",
+            url: `${siteUrl}/faq`,
+            siteName,
+            type: "website",
+            images: [
+                {
+                    url: ogImage,
+                    width: 1200,
+                    height: 630,
+                    alt: `${siteName} — FAQ`,
+                },
+            ],
+        },
+        alternates: { canonical: `${siteUrl}/faq` },
+    };
+}
 export default function FaqPage() {
     const [query, setQuery] = useState("");
     const [active, setActive] = useState(SECTIONS[0].id);

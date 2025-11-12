@@ -36,7 +36,7 @@ export default async function ClicksPage({
     const pages = Math.max(1, Math.ceil(total / take));
 
     return (
-        <div className="CasinoPage container">
+        <div className="AdminPage container">
             <h1>Клики</h1>
             <p>Всего: {total}</p>
 

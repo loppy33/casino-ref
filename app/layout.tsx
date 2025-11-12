@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import "./styles/index.sass";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Name";
 
 export const metadata: Metadata = {
-    title: "Casinos en ligne France — Bonus, Avis & Jeux Sécurisés",
+    title: `${siteName} — Bonus, Avis & Jeux Sécurisés`,
     description:
         "Découvrez les meilleurs casinos en ligne en France 🇫🇷 : bonus exclusifs, retraits rapides, et liens d’affiliation sécurisés. Jouez sur des sites fiables et agréés.",
     keywords: [
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
         description:
             "Sélection premium des meilleurs casinos français avec liens d’affiliation sûrs et bonus exclusifs.",
         url: `${siteUrl}`,
-        siteName: "Cazinoclub France",
+        siteName: siteName,
         locale: "fr_FR",
         type: "website",
         images: [
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
                 url: `${siteUrl}/logo.png`,
                 width: 1200,
                 height: 630,
-                alt: "Cazinoclub France — Top Casinos en Ligne",
+                alt: `${siteName} — Top Casinos en Ligne`,
             },
         ],
     },
