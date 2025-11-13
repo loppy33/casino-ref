@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"; // ставим вверху файла
+export const dynamic = "force-dynamic";
 
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
