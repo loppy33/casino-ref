@@ -1,0 +1,131 @@
+// Переменная для брейкпоинта (замени на свою, если нужно)
+$breakpoint-desktop: 992px
+
+// Блокируем скролл, когда меню открыто
+body.menu-is-open
+    overflow: hidden
+
+.site-header
+    // ... твои существующие стили хедера ...
+    position: fixed // Убедись, что хедер фиксирован
+    width: 100%
+    top: 0
+    left: 0
+    z-index: 100 // Хедер должен быть выше контента
+
+    &.is-menu-open
+        // Можно использовать для перекрытия оверлея
+        z-index: 102
+
+    &__inner
+        // ... твои стили ...
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+    // --- Стилизация Навигации (Мобильная версия) ---
+    &__nav
+        // Это будет наше полноэкранное мобильное меню
+        position: fixed
+        top: 0
+        left: 0
+        width: 100%
+        height: 100vh // 100% высоты экрана
+        background: var(--main-color) // Белый фон
+        z-index: 101 // Выше хедера, но ниже кнопки-бургера
+
+        // Скрываем по умолчанию
+        opacity: 0
+        visibility: hidden
+        transform: translateY(-100%)
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s
+
+        // Располагаем ссылки по центру
+        display: flex
+        flex-direction: column
+        align-items: center
+        justify-content: center
+        padding: 20px
+        gap: 20px // Пространство между ссылками
+
+        a
+            font-size: 24px
+            font-weight: 600
+            text-decoration: none
+            padding: 10px
+
+        // --- Состояние "Открыто" для мобильной навигации ---
+        &.is-open
+            opacity: 1
+            visibility: visible
+            transform: translateY(0)
+
+    // --- Стилизация Бургера (Мобильная версия) ---
+    &__burger
+        display: flex // Показываем бургер на мобильных
+        flex-direction: column
+        justify-content: space-around
+        width: 30px
+        height: 24px
+        background: transparent
+        border: none
+        cursor: pointer
+        padding: 0
+        z-index: 102 // Бургер всегда НАД мобильным меню
+        position: relative // Для z-index
+
+        span
+            width: 30px
+            height: 3px
+            background: var(--white-color) // Цвет полосок
+            border-radius: 3px
+            transition: all 0.3s linear
+            position: relative
+            transform-origin: 1px
+
+        // --- Анимация в "Крестик" ---
+        &.is-open
+            span
+                // background: #333 // Можно поменять цвет при открытии
+
+                &:nth-child(1)
+                    transform: rotate(45deg) translate(-2px, -5px)
+
+                &:nth-child(2)
+                    opacity: 0
+                    transform: translateX(20px)
+
+                &:nth-child(3)
+                    transform: rotate(-45deg) translate(2px, 0px)
+
+    // --- Десктопная версия (Переопределяем стили) ---
+    @media (min-width: $breakpoint-desktop)
+
+        // Возвращаем навигацию в обычный вид
+        &__nav
+            position: static // Сбрасываем fixed
+            height: auto
+            width: auto
+            background: none
+            z-index: 1 // Возвращаем z-index
+
+            // Сбрасываем оверлей-стили
+            opacity: 1
+            visibility: visible
+            transform: none
+            transition: none // Отключаем анимации
+
+            // Возвращаем горизонтальное меню
+            flex-direction: row
+            padding: 0
+            gap: 15px // Пробел между ссылками на десктопе
+
+            a
+                font-size: 16px // Возвращаем обычный размер
+                font-weight: 500
+                padding: 5px
+                // ... другие твои десктопные стили для ссылок ...
+
+        // Скрываем бургер на десктопе
+        &__burger
+            display: none
