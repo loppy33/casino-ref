@@ -23,16 +23,16 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Top Casinos en ligne France — Bonus & Avis",
         description:
-            "Sélection premium des meilleurs casinos français avec liens d’affiliation sûrs et bonus exclusifs.",
+            "Sélection premium des meilleurs casinos français avec les bonus exclusifs.",
         url: `${siteUrl}`,
         siteName: siteName,
         locale: "fr_FR",
         type: "website",
         images: [
             {
-                url: `${siteUrl}/logo.png`,
-                width: 1200,
-                height: 630,
+                url: `${siteUrl}/preview.png`,
+                width: 1024,
+                height: 935,
                 alt: `${siteName} — Top Casinos en Ligne`,
             },
         ],
