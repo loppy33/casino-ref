@@ -21,6 +21,7 @@ export default async function EditArticle({
     if (!id) notFound();
 
     const [a, categories] = await Promise.all([
+
         prisma.article.findUnique({
             where: { id },
             include: { categories: true },

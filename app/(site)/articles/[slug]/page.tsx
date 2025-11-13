@@ -27,8 +27,9 @@ const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
 
 type Props = { params: { slug: string } };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { slug } = params;
+export async function generateMetadata({ params }: { params: { slug?: string } }): Promise<Metadata> {
+    const resolvedParams = await params;
+    const slug = resolvedParams?.slug;
     const article = await prisma.article.findUnique({
         where: { slug },
         select: { title: true, bodyMd: true, published: true },

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-type ParamsP = { slug?: string  };
+type ParamsP = { slug?: string };
 const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -11,7 +11,8 @@ const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
 
 // ── SEO: динамические метаданные для страницы казино
 export async function generateMetadata({ params }: { params: ParamsP }): Promise<Metadata> {
-    const { slug } = params;
+    const resolvedParams = await params;
+    const slug = resolvedParams?.slug;
     if (!slug) return {};
 
     const casino = await prisma.casino.findUnique({
