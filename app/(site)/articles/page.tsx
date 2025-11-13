@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // ставим вверху файла
+
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
 import { mdToPlain } from "@/utils/mdToPlain";
