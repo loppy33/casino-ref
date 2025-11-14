@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from 'next/script'
 import "./styles/index.sass";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -63,7 +64,23 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="fr">
-            <body suppressHydrationWarning>{children}</body>
+            <body suppressHydrationWarning>
+                {children}
+                {/* Google Analytics */}
+                <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=G-CJLBD61KDL"
+                    strategy="afterInteractive"
+                />
+
+                <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-CJLBD61KDL');
+          `}
+                </Script>
+            </body>
         </html>
     );
 }
