@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Script from 'next/script'
 import "./styles/index.sass";
+import AnalyticsClient from "./analytics-client";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Name";
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-CJLBD61KDL";
 
 export const metadata: Metadata = {
+    // --- Ваши существующие метаданные ---
     title: `${siteName} — Bonus, Avis & Jeux Sécurisés`,
     description:
         "Découvrez les meilleurs casinos en ligne en France 🇫🇷 : bonus exclusifs, retraits rapides, et liens d’affiliation sécurisés. Jouez sur des sites fiables et agréés.",
@@ -31,7 +34,7 @@ export const metadata: Metadata = {
         type: "website",
         images: [
             {
-                url: `${siteUrl}/preview.png`,
+                url: `${siteUrl}/preview.png`, // Убедитесь, что 'public/preview.png' существует
                 width: 1024,
                 height: 935,
                 alt: `${siteName} — Top Casinos en Ligne`,
@@ -41,19 +44,38 @@ export const metadata: Metadata = {
     alternates: {
         canonical: `${siteUrl}`,
     },
-    // manifest: "/manifest.webmanifest",
-    icons: {
-        icon: [
-            { url: "/logo.png", type: "image/png", sizes: "32x32" },
-            { url: "/logo.png", type: "image/png", sizes: "192x192" },
-        ],
-        apple: [
-            { url: "/logo.png", sizes: "180x180", type: "image/png" },
-        ],
-    },
     robots: {
         index: true,
         follow: true,
+    },
+
+    // --- 👇 ИСПРАВЛЕННЫЕ СЕКЦИИ ---
+
+    /**
+     * Путь к файлу 'site.webmanifest', который находится в 'public/logo/'
+     */
+    manifest: "/logo/site.webmanifest",
+
+    /**
+     * Определение всех иконок из папки 'public/logo/'
+     */
+    icons: {
+        icon: [
+            // Стандартный .ico
+            { url: "/logo/favicon.ico", sizes: "any", type: "image/x-icon" },
+
+            // PNG иконки
+            { url: "/logo/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+            { url: "/logo/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+
+            // Иконки для Android/Chrome (Next.js добавит их в <head>)
+            { url: "/logo/android-chrome-192x192.png", type: "image/png", sizes: "192x192" },
+            { url: "/logo/android-chrome-512x512.png", type: "image/png", sizes: "512x512" },
+        ],
+        apple: [
+            // Иконка для Apple-устройств
+            { url: "/logo/apple-touch-icon.png", type: "image/png" },
+        ],
     },
 };
 
@@ -66,20 +88,25 @@ export default function RootLayout({
         <html lang="fr">
             <body suppressHydrationWarning>
                 {children}
+
                 {/* Google Analytics */}
                 <Script
-                    src="https://www.googletagmanager.com/gtag/js?id=G-CJLBD61KDL"
+                    src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
                     strategy="afterInteractive"
                 />
 
-                <Script id="google-analytics" strategy="afterInteractive">
+                <Script id="gtag-init" strategy="afterInteractive">
                     {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-CJLBD61KDL');
+            // отключаем авт. отправку page_view, чтобы не дублировать и управлять SPA-навигом вручную
+            gtag('config', '${GA_ID}', { send_page_view: false });
           `}
                 </Script>
+
+                {/* Клиентский компонент отслеживания маршрутов (отправляет page_view при смене маршрута) */}
+                <AnalyticsClient gaId={GA_ID} />
             </body>
         </html>
     );
