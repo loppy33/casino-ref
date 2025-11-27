@@ -98,7 +98,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                     {/* Logo + description */}
                     <div className="footer__brand">
                         <a href="/" className="footer__logo">
-                            <img src="/logo.png" alt="Cazinoclub France" />
+                            <img src="/logo.png" alt={siteName} />
 
                         </a>
                         <p className="footer__desc">
@@ -156,7 +156,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                 <div className="footer__bottom">
                     <div className="container">
                         <p>
-                            © {new Date().getFullYear()} Cazinoclub France — Tous droits réservés.
+                            © {new Date().getFullYear()} {siteName} — Tous droits réservés.
                             Ce site contient des liens d’affiliation et ne propose aucun jeu d’argent.
                         </p>
                     </div>
