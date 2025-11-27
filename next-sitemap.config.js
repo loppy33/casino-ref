@@ -12,8 +12,8 @@ module.exports = {
                 disallow: ["/admin", "/api"],
             },
         ],
-        additionalSitemaps: [
-            `${process.env.NEXT_PUBLIC_SITE_URL || "https://sitename.com"}/sitemap.xml`,
-        ],
+        // additionalSitemaps: [
+        //     `${process.env.NEXT_PUBLIC_SITE_URL || "https://sitename.com"}/sitemap.xml`,
+        // ],
     },
 };
