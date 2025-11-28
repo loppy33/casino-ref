@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             // Стандартный .ico
-            { url: "/logo/favicon.ico", sizes: "any", type: "image/x-icon" },
+            { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
 
             // PNG иконки
             { url: "/logo/favicon-16x16.png", type: "image/png", sizes: "16x16" },
