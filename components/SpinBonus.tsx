@@ -11,7 +11,7 @@ type BonusDTO = {
     affiliateLinks: { id: string; baseUrl: string; subTemplate?: string | null }[];
 };
 
-const FIVE_MIN = 5 * 60;
+const FIVE_MIN = 10; // в секундах
 const STORAGE_KEY = "spin_timer_expires_at";
 
 function getExpires(): number | null {
@@ -19,8 +19,7 @@ function getExpires(): number | null {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return null;
         const n = Number(raw);
-        if (Number.isNaN(n)) return null;
-        return n;
+        return Number.isNaN(n) ? null : n;
     } catch {
         return null;
     }
@@ -28,8 +27,6 @@ function getExpires(): number | null {
 
 export default function SpinBonus() {
     const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
-
     const [secondsLeft, setSecondsLeft] = useState(FIVE_MIN);
     const [ready, setReady] = useState(false);
 
@@ -40,78 +37,73 @@ export default function SpinBonus() {
     const [finalSelected, setFinalSelected] = useState<BonusDTO | null>(null);
 
     const spinRef = useRef<number | null>(null);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    // После монтирования читаем localStorage
     useEffect(() => {
-        if (!mounted) return;
-        const expires = getExpires();
-        const rem = expires ? Math.max(0, Math.floor((expires - Date.now()) / 1000)) : FIVE_MIN;
-        setSecondsLeft(rem);
-        setReady(rem <= 0);
-    }, [mounted]);
+        setMounted(true);
 
-    // Таймер
-    useEffect(() => {
-        if (!mounted) return;
-        const id = setInterval(() => {
+        let expires = getExpires();
+        if (!expires) {
+            expires = Date.now() + FIVE_MIN * 1000;
+            localStorage.setItem(STORAGE_KEY, expires.toString());
+        }
+
+        const updateTimer = () => {
             const expires = getExpires();
-            const rem = expires ? Math.max(0, Math.floor((expires - Date.now()) / 1000)) : 0;
-            setSecondsLeft(rem);
-            setReady(rem <= 0);
-        }, 1000);
-        return () => clearInterval(id);
-    }, [mounted]);
+            if (!expires || expires <= Date.now()) {
+                setSecondsLeft(0);
+                setReady(true);
+            } else {
+                setSecondsLeft(Math.ceil((expires - Date.now()) / 1000));
+                setReady(false);
+            }
+        };
 
-    useEffect(() => {
+        updateTimer();
+        intervalRef.current = setInterval(updateTimer, 1000);
+
         return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
             if (spinRef.current) clearTimeout(spinRef.current);
         };
     }, []);
 
-    function formatTime(sec: number) {
+    const formatTime = (sec: number) => {
         const m = Math.floor(sec / 60).toString().padStart(2, "0");
         const s = (sec % 60).toString().padStart(2, "0");
         return `${m}:${s}`;
-    }
+    };
 
-    // Резервируем слот при старте спина
-    function reserveCooldown() {
-        const expires = Date.now() + FIVE_MIN * 1000;
-        try {
-            localStorage.setItem(STORAGE_KEY, String(expires));
-        } catch { }
-        setSecondsLeft(FIVE_MIN);
+    const reserveCooldown = () => {
+        const expiresAt = Date.now() + FIVE_MIN * 1000;
+        localStorage.setItem(STORAGE_KEY, expiresAt.toString());
         setReady(false);
-    }
+        setSecondsLeft(FIVE_MIN);
+    };
 
-    async function openModal() {
-        const expires = getExpires();
-        if (expires && expires > Date.now()) {
-            alert(
-                `Spin disponible dans ${formatTime(Math.max(
-                    0,
-                    Math.floor((expires - Date.now()) / 1000)
-                ))}`
-            );
-            return;
-        }
-
+    const openModal = async () => {
         if (bonuses.length === 0) {
-            const res = await fetch("/api/bonuses", { cache: "no-store" });
-            if (!res.ok) throw new Error("Failed");
-            const data: BonusDTO[] = await res.json();
-            setBonuses(data);
-
+            try {
+                const res = await fetch("/api/bonuses", { cache: "no-store" });
+                if (!res.ok) throw new Error("Failed");
+                const data: BonusDTO[] = await res.json();
+                setBonuses(data);
+            } catch {
+                setBonuses([
+                    { id: "1", name: "100% + 50 FS", casino: { id: "c1", name: "Vavada" }, affiliateLinks: [] },
+                    { id: "2", name: "200 FS No Wager", casino: { id: "c2", name: "1Win" }, affiliateLinks: [], promocode: "WIN2025" },
+                    { id: "3", name: "500% Welcome Pack", casino: { id: "c3", name: "Stake" }, affiliateLinks: [] },
+                ]);
+            }
         }
 
         setPreview(null);
         setFinalSelected(null);
         setModalOpen(true);
-    }
+    };
 
-    async function doSpin() {
+    const doSpin = async () => {
         if (spinning || bonuses.length === 0) return null;
-
         reserveCooldown();
         setSpinning(true);
         setPreview(null);
@@ -125,8 +117,7 @@ export default function SpinBonus() {
         return new Promise<BonusDTO | null>((resolve) => {
             const tick = (t: number) => {
                 const progress = Math.min(1, (t - start) / totalMs);
-                const easedInterval = intervalStart + (intervalEnd - intervalStart) * (progress * progress);
-
+                const easedInterval = intervalStart + (intervalEnd - intervalStart) * progress * progress;
                 const rnd = bonuses[Math.floor(Math.random() * bonuses.length)];
                 setPreview(rnd);
 
@@ -146,26 +137,23 @@ export default function SpinBonus() {
 
             tick(performance.now());
         });
-    }
+    };
 
-    function goToBonus(b: BonusDTO | null) {
+    const goToBonus = (b: BonusDTO | null) => {
         if (!b) return;
         if (b.promocode) navigator.clipboard.writeText(b.promocode).catch(() => { });
         const target = b.bonusUrl ?? b.affiliateLinks?.[0]?.baseUrl ?? null;
         if (target) window.open(target, "_blank");
         setModalOpen(false);
-    }
+    };
 
-    const shown = spinning ? preview : finalSelected ?? preview;
     if (!mounted) return null;
+    const shown = spinning ? preview : finalSelected ?? preview;
 
     return (
         <>
             <div className="spin-floating-wrapper">
-                <div
-                    className={`spin-floating ${ready ? "spin-floating--ready" : ""}`}
-                    onClick={() => { if (ready) openModal(); }}
-                >
+                <div className={`spin-floating ${ready ? "spin-floating--ready" : ""}`} onClick={() => ready && openModal()}>
                     {!ready ? (
                         <>
                             <div className="spin-floating__label">Bonus disponible dans</div>
@@ -178,7 +166,7 @@ export default function SpinBonus() {
             </div>
 
             {modalOpen && (
-                <div className="spin-modal" onClick={() => { if (!spinning) setModalOpen(false); }}>
+                <div className="spin-modal" onClick={() => !spinning && setModalOpen(false)}>
                     <div className="spin-modal__content" onClick={(e) => e.stopPropagation()}>
                         <div className="spin-modal__title">Votre bonus personnalisé</div>
                         <div className="spin-modal__preview">
@@ -204,7 +192,7 @@ export default function SpinBonus() {
 
                         <div className="spin-actions">
                             {!finalSelected ? (
-                                <button className="btn btn--primary" onClick={() => { if (!spinning) void doSpin(); }} disabled={spinning || bonuses.length === 0}>
+                                <button className="btn btn--primary" onClick={() => !spinning && doSpin()} disabled={spinning || bonuses.length === 0}>
                                     {spinning ? "Sélection en cours..." : "Ouvrir"}
                                 </button>
                             ) : (
@@ -214,9 +202,7 @@ export default function SpinBonus() {
                             )}
                         </div>
 
-                        <div className="spin-meta">
-                            {bonuses.length === 0 ? "Initialisation..." : "Provably Fair • Connexion sécurisée"}
-                        </div>
+                        <div className="spin-meta">{bonuses.length === 0 ? "Initialisation..." : "Provably Fair • Connexion sécurisée"}</div>
                     </div>
                 </div>
             )}
