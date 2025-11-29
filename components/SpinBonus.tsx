@@ -11,7 +11,7 @@ type BonusDTO = {
     affiliateLinks: { id: string; baseUrl: string; subTemplate?: string | null }[];
 };
 
-const FIVE_MIN = 10; // в секундах
+const FIVE_MIN = 5 * 60; // в секундах
 const STORAGE_KEY = "spin_timer_expires_at";
 
 function getExpires(): number | null {
