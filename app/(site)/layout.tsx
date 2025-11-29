@@ -3,6 +3,7 @@ const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "NAME";
 
 import { useEffect, useState } from "react";
 import Link from "next/link"; // 👈 Импортируем Link
+import Image from "next/image";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
     const [scrolled, setScrolled] = useState(false);
@@ -97,8 +98,14 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                     {/* Logo + description */}
                     <div className="footer__brand">
                         <a href="/" className="footer__logo">
-                            <img src="/logo.webp" alt={siteName} />
 
+                            <Image
+                                src="/logo.webp"
+                                alt="Casino Search"
+                                width={100}
+                                height={100}
+                                quality={75}
+                            />
                         </a>
                         <p className="footer__desc">
                             Le guide premium des meilleurs casinos en ligne en France. Profitez

@@ -66,7 +66,7 @@ export default function Bg() {
                             fill
                             placeholder="blur"
                             sizes="(max-width: 768px) 345px, 517px"
-                            quality={90}
+                            quality={75}
                             style={{ objectFit: "cover" }}
                         />
                     </motion.div>
@@ -91,6 +91,7 @@ export default function Bg() {
                         priority
                         fill
                         placeholder="blur"
+                        quality={75}
                         style={{ objectFit: "cover" }}
                     />
                 </motion.div>
