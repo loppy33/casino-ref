@@ -4,8 +4,8 @@ import { useEffect } from "react"; // 1. Добавляем useEffect
 import Image from "next/image";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 
-import bgImage from "../public/bg.png";
-import bgCharacter from "../public/bg_character.png";
+import bgImage from "../public/bg.webp";
+import bgCharacter from "../public/bg_character.webp";
 
 export default function Bg() {
     const mouseX = useMotionValue(0);
@@ -65,6 +65,8 @@ export default function Bg() {
                             priority
                             fill
                             placeholder="blur"
+                            // sizes="(max-width: 768px) 345px, 517px"
+                            // quality={40}
                             style={{ objectFit: "contain" }}
                         />
                     </motion.div>

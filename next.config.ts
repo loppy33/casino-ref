@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    appDir: true, // обязательно для App Router
-  },
   async rewrites() {
     return [
       // Прокси только для API

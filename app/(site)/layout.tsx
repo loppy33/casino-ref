@@ -41,7 +41,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
             <header className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
                 <div className="container site-header__inner">
                     <Link href="/" className="site-header__logo" onClick={closeMenu}> {/* 👈 Меняем <a> на Link и добавляем onClick */}
-                        <img src="/logo.webp" alt={siteName} /> {/* 👈 Добавлен alt */}
+                        <img src="logoHeader.webp" alt={siteName} /> {/* 👈 Добавлен alt */}
                         {siteName}
                     </Link>
 
@@ -77,7 +77,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                 </div>
 
                 <div className="site-header__age">
-                    <img src="/age.webp" alt="" />
                     <span>
                         18 ans et plus. Jouez de manière responsable. Aide:{" "}
                         <a
