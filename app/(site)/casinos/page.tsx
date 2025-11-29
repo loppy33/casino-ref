@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const defaultDesc =
         "Découvrez tous les casinos en ligne vérifiés en France. Classement par note, bonus et fiabilité. Jouez sur des sites de confiance sélectionnés par nos experts.";
     const description = top && top.shortDesc ? top.shortDesc : defaultDesc;
-    const ogImage = top?.logoUrl ? top.logoUrl : `${siteUrl}/logo.png`;
+    const ogImage = top?.logoUrl ? top.logoUrl : `${siteUrl}/logo.webp`;
     const url = `${siteUrl}/casinos`;
 
     return {

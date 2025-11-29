@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "Découvrez nos articles sur les casinos en ligne : conseils, actualités, bonus, et stratégies pour jouer intelligemment et en toute sécurité.";
 
     const description = latest ? mdToPlain(latest.bodyMd).slice(0, 160) : defaultDesc;
-    const ogImage = latest ? `${siteUrl}/api/og/article/${latest.slug}` : `${siteUrl}/logo.png`;
+    const ogImage = latest ? `${siteUrl}/api/og/article/${latest.slug}` : `${siteUrl}/logo.webp`;
     // Пример: можно иметь route для генерации OG-изображений /api/og/article/[slug]
 
     return {

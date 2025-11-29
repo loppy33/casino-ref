@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: ParamsP }): Promise
 
     const ogImage = casino.logoUrl
         ? [{ url: casino.logoUrl, width: 1200, height: 630, alt: casino.name }]
-        : [{ url: `${siteUrl}/logo.png`, width: 1200, height: 630, alt: siteName }];
+        : [{ url: `${siteUrl}/logo.webp`, width: 1200, height: 630, alt: siteName }];
 
     const canonical = `${siteUrl}/casinos/${casino.slug}`;
 
