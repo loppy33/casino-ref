@@ -55,7 +55,10 @@ export default function Bg() {
                             priority
                             placeholder="blur"
                             quality={75}
-                            sizes="(max-width: 480px) 250px, (max-width: 768px) 345px, 517px"
+                            sizes="(max-width: 480px) 250px,
+                            (max-width: 768px) 345px,
+                            (max-width: 1024px) 450px,
+                            517px"
                             style={{ objectFit: "contain" }}
                         />
                     </motion.div>
@@ -80,7 +83,10 @@ export default function Bg() {
                         fill
                         placeholder="blur"
                         quality={75}
-                        sizes="(max-width: 768px) 100vw, 1398px"
+                        sizes="(max-width: 480px) 480px,
+                        (max-width: 768px) 768px,
+                        (max-width: 1024px) 1024px,
+                        1398px"
                         style={{ objectFit: "cover" }}
                     />
                 </motion.div>
