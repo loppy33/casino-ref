@@ -54,7 +54,7 @@ export default function Bg() {
                             height={517} // фиксированная высота
                             priority
                             placeholder="blur"
-                            quality={75}
+                            quality={50}
                             sizes="(max-width: 480px) 250px,
                             (max-width: 768px) 345px,
                             (max-width: 1024px) 450px,
@@ -80,9 +80,10 @@ export default function Bg() {
                         src={bgImage}
                         alt=""
                         priority
+                        fetchPriority="high"
                         fill
                         placeholder="blur"
-                        quality={75}
+                        quality={50}
                         sizes="(max-width: 480px) 480px,
                         (max-width: 768px) 768px,
                         (max-width: 1024px) 1024px,
