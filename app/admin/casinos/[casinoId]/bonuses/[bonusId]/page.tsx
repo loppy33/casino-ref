@@ -1,11 +1,25 @@
 import { prisma } from "@/lib/db";
 import { updateBonus, deleteBonus } from "../../../actions";
-import Link from "next/link";
+import { notFound } from "next/navigation";
 
-export default async function EditBonus({ params }: { params: { casinoId: string; id: string } }) {
-    const { casinoId, id } = params;
+type ParamsP = Promise<{ casinoId?: string | string[]; bonusId?: string | string[] } | undefined>;
+const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v ?? "");
 
-    const bonus = await prisma.bonus.findUnique({ where: { id } });
+
+export default async function EditBonus({
+    params,
+}: {
+    params: ParamsP;
+}) {
+    const p = (await params) ?? {};
+    const casinoId = first(p.casinoId);
+    const bonusId = first(p.bonusId);
+
+    if (!bonusId) notFound();
+
+    const bonus = await prisma.bonus.findUnique({
+        where: { id: bonusId }
+    });
     if (!bonus) return <div className="container">Бонус не найден</div>;
 
     return (
