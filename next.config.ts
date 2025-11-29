@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    qualities: [50, 60, 75, 85, 90]
+  },
   async rewrites() {
     return [
       // Прокси только для API
