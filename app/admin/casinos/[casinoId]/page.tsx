@@ -1,6 +1,6 @@
 // app/admin/casinos/[id]/page.tsx
 import { prisma } from "@/lib/db";
-import { deleteLink, updateCasino } from "../actions";
+import { deleteBonus, deleteLink, updateCasino } from "../actions";
 
 export default async function EditCasino({ params }: { params: { casinoId: string } }) {
     const { casinoId } = await params;     // 👈 распаковали
@@ -8,7 +8,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
     const [casino, categories] = await Promise.all([
         prisma.casino.findUnique({
             where: { id: casinoId },           // 👈 теперь не undefined
-            include: { categories: true, links: true },
+            include: { categories: true, links: true, bonuses: true },
         }),
         prisma.category.findMany({ orderBy: { name: "asc" } }),
     ]);
@@ -92,6 +92,40 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                                         action={async () => {
                                             "use server";
                                             await deleteLink(l.id, casino.id);
+                                        }}
+                                    >
+                                        <button className="danger__btn">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </section>
+            <section className="mt-4">
+                <h3>Бонусы <a className="link__btn" href={`/admin/casinos/${casino.id}/bonuses/new`}>+ Добавить бонус</a></h3>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>URL</th>
+                            <th>Промокод</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {casino.bonuses.map((b: (typeof casino.bonuses)[number]) => (
+                            <tr key={b.id}>
+                                <td>
+                                    <a href={`/admin/casinos/${casinoId}/bonuses/${b.id}`}>{b.name}</a>
+                                </td>
+                                <td className="truncate">{b.bonusUrl || "-"}</td>
+                                <td>{b.promocode || "-"}</td>
+                                <td className="ta-right">
+                                    <form
+                                        action={async () => {
+                                            "use server";
+                                            await deleteBonus(b.id, casino.id);
                                         }}
                                     >
                                         <button className="danger__btn">Удалить</button>

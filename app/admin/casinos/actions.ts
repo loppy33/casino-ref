@@ -2,51 +2,51 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
+import { z as z2 } from "zod";
 
-// схемы валидации
-const emptyToUndef = (v: unknown) => (typeof v === "string" && v.trim() === "" ? undefined : v);
+/* ----------------------------- Общие схемы ----------------------------- */
+
+const emptyToUndef = (v: unknown) =>
+  typeof v === "string" && v.trim() === "" ? undefined : v;
+
 const toSlug = (v: unknown) => {
   if (typeof v !== "string") return v;
   return v
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, "-")     // пробелы -> "-"
-    .replace(/[^a-z0-9-]/g, ""); // выкинем недопустимые символы
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 };
+
+/* --------------------------- Casino (существующий) --------------------------- */
+
 const casinoSchema = z.object({
   id: z.string().optional(),
 
-  // обязательные с тримом
   name: z.string().trim().min(2, "Название слишком короткое"),
   slug: z.preprocess(
     toSlug,
     z.string().min(2).regex(/^[a-z0-9-]+$/, "slug: только a-z, 0-9, -")
   ),
-  // числовые: пустая строка не считается ошибкой
+
   rating: z.preprocess(emptyToUndef, z.coerce.number().int().min(0).max(100).optional()),
   minDeposit: z.preprocess(emptyToUndef, z.coerce.number().int().min(0).optional()),
 
   license: z.preprocess(emptyToUndef, z.string().trim().optional()),
   shortDesc: z.preprocess(emptyToUndef, z.string().trim().max(600).optional()),
-  // url: "" -> undefined; допускаем http(s) ИЛИ относительный путь "/..."
+
   logoUrl: z.preprocess(
     emptyToUndef,
-    z
-      .union([z.string().url(), z.string().startsWith("/")])
-      .optional()
-  ),
-  // checkbox: если не пришёл -> true по умолчанию (или поставь false, если нужно)
-  is18plus: z.preprocess(
-    (v) => (v === undefined ? true : v),
-    z.coerce.boolean()
+    z.union([z.string().url(), z.string().startsWith("/")]).optional()
   ),
 
-  // textarea строки, мы распарсим вручную ниже
+  is18plus: z.preprocess((v) => (v === undefined ? true : v), z.coerce.boolean()),
+
   pros: z.preprocess(emptyToUndef, z.string().optional()),
   cons: z.preprocess(emptyToUndef, z.string().optional()),
 
-  // множественный чекбокс
   categoryIds: z.array(z.string()).optional().default([]),
 });
 
@@ -75,9 +75,9 @@ export async function createCasino(formData: FormData) {
       is18plus: parsed.is18plus,
       logoUrl: parsed.logoUrl || null,
       shortDesc: parsed.shortDesc || null,
-      pros: (parsed.pros || "").split("\n").map(s => s.trim()).filter(Boolean),
-      cons: (parsed.cons || "").split("\n").map(s => s.trim()).filter(Boolean),
-      categories: { connect: parsed.categoryIds.map(id => ({ id })) },
+      pros: (parsed.pros || "").split("\n").map((s) => s.trim()).filter(Boolean),
+      cons: (parsed.cons || "").split("\n").map((s) => s.trim()).filter(Boolean),
+      categories: { connect: parsed.categoryIds.map((id) => ({ id })) },
     },
   });
 
@@ -111,11 +111,11 @@ export async function updateCasino(formData: FormData) {
       is18plus: parsed.is18plus,
       logoUrl: parsed.logoUrl || null,
       shortDesc: parsed.shortDesc || null,
-      pros: (parsed.pros || "").split("\n").map(s => s.trim()).filter(Boolean),
-      cons: (parsed.cons || "").split("\n").map(s => s.trim()).filter(Boolean),
+      pros: (parsed.pros || "").split("\n").map((s) => s.trim()).filter(Boolean),
+      cons: (parsed.cons || "").split("\n").map((s) => s.trim()).filter(Boolean),
       categories: {
-        set: [], // очистим и поставим новые
-        connect: parsed.categoryIds.map(id => ({ id })),
+        set: [],
+        connect: parsed.categoryIds.map((id) => ({ id })),
       },
     },
   });
@@ -129,8 +129,7 @@ export async function deleteCasino(id: string) {
   revalidatePath("/admin/casinos");
 }
 
-/* ---- AffiliateLink (вложенный CRUD) ---- */
-import { z as z2 } from "zod";
+/* --------------------------- AffiliateLink (вложенный CRUD) --------------------------- */
 
 const linkSchema = z2.object({
   id: z2.string().optional(),
@@ -189,4 +188,86 @@ export async function updateLink(formData: FormData) {
 export async function deleteLink(id: string, casinoId: string) {
   await prisma.affiliateLink.delete({ where: { id } });
   revalidatePath(`/admin/casinos/${casinoId}`);
+}
+
+/* --------------------------------- Bonuses --------------------------------- */
+
+const emptyToNull = (v: unknown) =>
+  typeof v === "string" && v.trim() === "" ? null : v;
+
+const bonusSchema = z2.object({
+  id: z2.string().optional(),
+  casinoId: z2.string(),
+  name: z2.string().trim().min(1, "Название обязательно"),
+  bonusUrl: z2.preprocess(emptyToNull, z2.string().nullable().optional()),
+  promocode: z2.preprocess(emptyToNull, z2.string().nullable().optional()),
+});
+
+export async function createBonus(formData: FormData) {
+  const parsed = bonusSchema.safeParse({
+    casinoId: String(formData.get("casinoId") || ""),
+    name: formData.get("name"),
+    bonusUrl: formData.get("bonusUrl"),
+    promocode: formData.get("promocode"),
+  });
+
+  if (!parsed.success) {
+    const msg = encodeURIComponent(parsed.error.issues.map((i) => i.message).join("; "));
+    redirect(`/admin/casinos/${String(formData.get("casinoId") || "")}?error=${msg}`);
+  }
+
+  const p = parsed.data;
+
+  await prisma.bonus.create({
+    data: {
+      casinoId: p.casinoId,
+      name: p.name,
+      bonusUrl: p.bonusUrl ?? null,
+      promocode: p.promocode ?? null,
+    },
+  });
+
+  revalidatePath(`/admin/casinos/${p.casinoId}`);
+  redirect(`/admin/casinos/${p.casinoId}`);
+}
+
+export async function updateBonus(formData: FormData) {
+  const parsed = bonusSchema.safeParse({
+    id: formData.get("id"),
+    casinoId: String(formData.get("casinoId") || ""),
+    name: formData.get("name"),
+    bonusUrl: formData.get("bonusUrl"),
+    promocode: formData.get("promocode"),
+  });
+
+  if (!parsed.success) {
+    const id = String(formData.get("id") || "");
+    const casinoId = String(formData.get("casinoId") || "");
+    const msg = encodeURIComponent(parsed.error.issues.map((i) => i.message).join("; "));
+    redirect(`/admin/casinos/${casinoId}/bonuses/${id}?error=${msg}`);
+  }
+
+  const p = parsed.data;
+
+  await prisma.bonus.update({
+    where: { id: p.id! },
+    data: {
+      name: p.name,
+      bonusUrl: p.bonusUrl ?? null,
+      promocode: p.promocode ?? null,
+    },
+  });
+
+  revalidatePath(`/admin/casinos/${p.casinoId}`);
+  redirect(`/admin/casinos/${p.casinoId}`);
+}
+
+export async function deleteBonus(bonusId: string, casinoId?: string) {
+  await prisma.bonus.delete({ where: { id: bonusId } });
+
+  if (casinoId) revalidatePath(`/admin/casinos/${casinoId}`);
+  revalidatePath("/admin/casinos");
+
+  if (casinoId) redirect(`/admin/casinos/${casinoId}`);
+  redirect("/admin/casinos");
 }

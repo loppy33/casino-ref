@@ -4,6 +4,7 @@ const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "NAME";
 import { useEffect, useState } from "react";
 import Link from "next/link"; // 👈 Импортируем Link
 import Image from "next/image";
+import SpinBonus from "@/components/SpinBonus";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
     const [scrolled, setScrolled] = useState(false);
@@ -91,7 +92,10 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                 </div>
             </header>
 
-            <main>{children}</main>
+            <main>
+                {children}
+                <SpinBonus />
+            </main>
 
             <footer className="site-footer">
                 <div className="container footer__inner">

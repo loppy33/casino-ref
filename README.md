@@ -7,6 +7,16 @@
 npx next-sitemap
 # затем проверь files в public/: sitemap.xml, sitemap-0.xml и т.д.
 
+<!-- Обновление бд -->
+
+Тесты, ручная проверка.
+npx prisma migrate dev --name add-user-nickname
+
+
+На сервере
+git push → на прод npx prisma migrate deploy.
+
+
 <!-- Обновления на сервере -->
 git pull
 npm run build

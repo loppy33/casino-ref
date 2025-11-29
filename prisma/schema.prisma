@@ -50,6 +50,7 @@ model Casino {
   cons       String[] // text[] в Postgres
 
   links AffiliateLink[]
+  bonuses Bonus[]
 
   // M2M с категориями (обе стороны должны быть)
   categories Category[] @relation("CasinoCategories")
@@ -73,6 +74,17 @@ model AffiliateLink {
 
   // обратная сторона для Click.link
   clicks Click[]
+}
+
+model Bonus {
+  id          String  @id @default(cuid())
+  casinoId    String
+
+  name        String
+  bonusUrl    String?
+  promocode   String?
+
+  casino Casino @relation(fields: [casinoId], references: [id], onDelete: Cascade)
 }
 
 model Article {
