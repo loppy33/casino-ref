@@ -83,18 +83,11 @@ export default function SpinBonus() {
 
     const openModal = async () => {
         if (bonuses.length === 0) {
-            try {
-                const res = await fetch("/api/bonuses", { cache: "no-store" });
-                if (!res.ok) throw new Error("Failed");
-                const data: BonusDTO[] = await res.json();
-                setBonuses(data);
-            } catch {
-                setBonuses([
-                    { id: "1", name: "100% + 50 FS", casino: { id: "c1", name: "Vavada" }, affiliateLinks: [] },
-                    { id: "2", name: "200 FS No Wager", casino: { id: "c2", name: "1Win" }, affiliateLinks: [], promocode: "WIN2025" },
-                    { id: "3", name: "500% Welcome Pack", casino: { id: "c3", name: "Stake" }, affiliateLinks: [] },
-                ]);
-            }
+            const res = await fetch("/api/bonuses", { cache: "no-store" });
+            if (!res.ok) throw new Error("Failed");
+            const data: BonusDTO[] = await res.json();
+            setBonuses(data);
+
         }
 
         setPreview(null);
