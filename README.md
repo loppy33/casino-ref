@@ -14,6 +14,8 @@ npx prisma migrate dev --name add-user-nickname
 
 
 На сервере
+npx prisma generate
+
 git push → на прод npx prisma migrate deploy.
 
 

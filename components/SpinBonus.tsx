@@ -11,7 +11,7 @@ type BonusDTO = {
     affiliateLinks: { id: string; baseUrl: string; subTemplate?: string | null }[];
 };
 
-const FIVE_MIN = 5 * 60; // 5 * 60 в продакшене
+const FIVE_MIN = 5 * 60;
 const STORAGE_KEY = "spin_timer_expires_at";
 
 function getExpires(): number | null {
@@ -30,10 +30,8 @@ export default function SpinBonus() {
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
-    const [secondsLeft, setSecondsLeft] = useState<number>(() => {
-        const expires = typeof window !== "undefined" ? getExpires() : null;
-        return expires ? Math.max(0, Math.floor((expires - Date.now()) / 1000)) : FIVE_MIN;
-    });
+    const [secondsLeft, setSecondsLeft] = useState(FIVE_MIN);
+    const [ready, setReady] = useState(false);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [bonuses, setBonuses] = useState<BonusDTO[]>([]);
@@ -43,14 +41,18 @@ export default function SpinBonus() {
 
     const spinRef = useRef<number | null>(null);
 
-    // Таймер
-    const [ready, setReady] = useState(() => {
-        const expires = getExpires();
-        return !expires || expires <= Date.now();
-    });
-
-    // useEffect для синхронизации ready с таймером
+    // После монтирования читаем localStorage
     useEffect(() => {
+        if (!mounted) return;
+        const expires = getExpires();
+        const rem = expires ? Math.max(0, Math.floor((expires - Date.now()) / 1000)) : FIVE_MIN;
+        setSecondsLeft(rem);
+        setReady(rem <= 0);
+    }, [mounted]);
+
+    // Таймер
+    useEffect(() => {
+        if (!mounted) return;
         const id = setInterval(() => {
             const expires = getExpires();
             const rem = expires ? Math.max(0, Math.floor((expires - Date.now()) / 1000)) : 0;
@@ -58,7 +60,7 @@ export default function SpinBonus() {
             setReady(rem <= 0);
         }, 1000);
         return () => clearInterval(id);
-    }, []);
+    }, [mounted]);
 
     useEffect(() => {
         return () => {
@@ -72,17 +74,25 @@ export default function SpinBonus() {
         return `${m}:${s}`;
     }
 
-    // Резервируем слот сразу при нажатии на "Открыть"
+    // Резервируем слот при старте спина
     function reserveCooldown() {
         const expires = Date.now() + FIVE_MIN * 1000;
-        try { localStorage.setItem(STORAGE_KEY, String(expires)); } catch { }
+        try {
+            localStorage.setItem(STORAGE_KEY, String(expires));
+        } catch { }
         setSecondsLeft(FIVE_MIN);
+        setReady(false);
     }
 
     async function openModal() {
         const expires = getExpires();
         if (expires && expires > Date.now()) {
-            alert(`Spin доступен через ${formatTime(Math.max(0, Math.floor((expires - Date.now()) / 1000)))}`);
+            alert(
+                `Spin disponible dans ${formatTime(Math.max(
+                    0,
+                    Math.floor((expires - Date.now()) / 1000)
+                ))}`
+            );
             return;
         }
 
@@ -91,6 +101,7 @@ export default function SpinBonus() {
             if (!res.ok) throw new Error("Failed");
             const data: BonusDTO[] = await res.json();
             setBonuses(data);
+
         }
 
         setPreview(null);
@@ -101,7 +112,7 @@ export default function SpinBonus() {
     async function doSpin() {
         if (spinning || bonuses.length === 0) return null;
 
-        reserveCooldown(); // <-- блокируем сразу
+        reserveCooldown();
         setSpinning(true);
         setPreview(null);
         setFinalSelected(null);
@@ -115,6 +126,7 @@ export default function SpinBonus() {
             const tick = (t: number) => {
                 const progress = Math.min(1, (t - start) / totalMs);
                 const easedInterval = intervalStart + (intervalEnd - intervalStart) * (progress * progress);
+
                 const rnd = bonuses[Math.floor(Math.random() * bonuses.length)];
                 setPreview(rnd);
 
@@ -167,7 +179,7 @@ export default function SpinBonus() {
 
             {modalOpen && (
                 <div className="spin-modal" onClick={() => { if (!spinning) setModalOpen(false); }}>
-                    <div className="spin-modal__content" onClick={e => e.stopPropagation()}>
+                    <div className="spin-modal__content" onClick={(e) => e.stopPropagation()}>
                         <div className="spin-modal__title">Votre bonus personnalisé</div>
                         <div className="spin-modal__preview">
                             <div className="spin-preview-inner">
@@ -175,14 +187,11 @@ export default function SpinBonus() {
                                     <div className={`spin-card ${spinning ? "spin-card--spinning" : "spin-card--final"}`}>
                                         <div className="spin-card__casino">{shown.casino?.name ?? "Exclusif"}</div>
                                         <div className="spin-card__title">{shown.name}</div>
-                                        {!spinning && (
-                                            shown.promocode && (
-                                                <div className="spin-card__promo">
-                                                    <div className="spin-card__promo-label">Code promo</div>
-                                                    <div className="spin-card__promo-code">{shown.promocode}</div>
-                                                </div>
-
-                                            )
+                                        {!spinning && shown.promocode && (
+                                            <div className="spin-card__promo">
+                                                <div className="spin-card__promo-label">Code promo</div>
+                                                <div className="spin-card__promo-code">{shown.promocode}</div>
+                                            </div>
                                         )}
                                     </div>
                                 ) : (
@@ -194,10 +203,6 @@ export default function SpinBonus() {
                         </div>
 
                         <div className="spin-actions">
-                            {/* <button className="btn btn--ghost" onClick={() => { if (!spinning) setModalOpen(false); }} disabled={spinning}>
-                                Fermer
-                            </button> */}
-
                             {!finalSelected ? (
                                 <button className="btn btn--primary" onClick={() => { if (!spinning) void doSpin(); }} disabled={spinning || bonuses.length === 0}>
                                     {spinning ? "Sélection en cours..." : "Ouvrir"}
