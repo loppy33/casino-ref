@@ -134,7 +134,6 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
 
                 <article
                     className="article-card"
-                    style={{ padding: 20, borderRadius: 14, lineHeight: 1.65, fontSize: "1.02rem" }}
                 >
                     <div
                         className="prose"
