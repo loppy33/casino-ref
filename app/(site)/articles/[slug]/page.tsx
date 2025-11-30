@@ -150,7 +150,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
                 </div>
 
                 {related.length ? (
-                    <div className="article-grid">
+                    <div className="article-grid article-page">
                         {related.map(a => (
                             <article key={a.id} className="article-card">
                                 <h3 className="article-card__title">

@@ -64,7 +64,7 @@ $glass: blur(16px)
   align-items: flex-end
   gap: 8px
 
-  @media ( max-width: 768px ) 
+  @media ( max-width: 768px )
     right: 10px
     bottom: 10px
 
@@ -103,9 +103,8 @@ $glass: blur(16px)
 
   @media ( max-width: 768px)
     width: 50px
-    padding: 7px 10px 
+    padding: 7px 10px
     text-align: center
-    
 
 // Состояние "Готово" (Зеленое свечение)
 .spin-floating--ready
@@ -301,7 +300,6 @@ $glass: blur(16px)
 
   @media ( max-width: 768px )
     font-size: 12px
-    
 
 /* --- ACTIONS --- */
 
@@ -311,59 +309,9 @@ $glass: blur(16px)
   gap: 12px
   margin-top: 12px
 
-.btn
-  height: 48px
-  border-radius: 12px
-  font-weight: 700
-  font-size: 14px
-  cursor: pointer
-  transition: all 0.2s ease
-  border: none
-  display: flex
-  align-items: center
-  justify-content: center
-  outline: none
-
-  width: 100%
-
-  &:active
-    transform: scale(0.98)
-
-  &:disabled
-    opacity: 0.5
-    cursor: not-allowed
-
-.btn--ghost
-  background: transparent
-  color: $c-text-sec
-  border: 1px solid rgba(255,255,255,0.1)
-
-  &:hover:not(:disabled)
-    background: rgba(255,255,255,0.05)
-    color: $c-text-main
-    border-color: rgba(255,255,255,0.2)
-
-.btn--primary
-  // Градиент на базе твоего --main-color (#1877e4)
-  background: $grad-primary
-  color: #fff
-  box-shadow: 0 4px 20px rgba(24, 119, 228, 0.4)
-  border: 1px solid rgba(255,255,255,0.1)
-
-  &:hover:not(:disabled)
-    box-shadow: 0 6px 25px rgba(24, 119, 228, 0.6)
-    filter: brightness(1.1)
-
-.btn--success
-  // Градиент на базе нового зеленого
-  background: $grad-success
-  color: #fff
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4)
-  border: none
-
-  &:hover:not(:disabled)
-    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6)
-    filter: brightness(1.1)
+  .btn
+    width: 100%
+    height: 48px
 
 .spin-meta
   margin-top: 16px

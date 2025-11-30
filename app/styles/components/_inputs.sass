@@ -22,16 +22,67 @@ button, .link__btn
     cursor: pointer
     border: none
 
-    background: var(--main-color)
-    color: var(--white-color)
-    padding: .8rem
-    border-radius: .8rem
+//     background: var(--main-color)
+//     color: var(--white-color)
+    // padding: .8rem
+    // border-radius: .8rem
 
-    font-size: 1rem
-    font-weight: 600
-    transition: .3s
+    // font-size: 1rem
+//     font-weight: 600
+//     transition: .3s
 
-    &:hover
-        opacity: .7
-        color: var(--white-color)
+//     &:hover
+//         opacity: .7
+//         color: var(--white-color)
 
+.btn
+    // height: 48px
+    border-radius: 12px
+    font-weight: 700
+    font-size: 14px
+    cursor: pointer
+    transition: all 0.2s ease
+    border: none
+    display: flex
+    align-items: center
+    justify-content: center
+    outline: none
+    // width: 100%
+
+    &:active
+        transform: scale(0.98)
+
+    &:disabled
+        opacity: 0.5
+        cursor: not-allowed
+
+.btn--ghost
+    background: transparent
+    color: var(--sec-text-color)
+    border: 1px solid rgba(255,255,255,0.1)
+
+    &:hover:not(:disabled)
+        background: rgba(255,255,255,0.05)
+        color: var(--sec-text-color)
+        border-color: rgba(255,255,255,0.2)
+
+.btn--primary
+    background: linear-gradient(135deg, var(--main-color) 0%, color-mix(in srgb, var(--main-color), white 15%) 100%)
+    color: #fff
+    box-shadow: 0 4px 20px rgba(24, 119, 228, 0.4)
+    border: 1px solid rgba(255,255,255,0.1)
+
+    &:hover:not(:disabled)
+        box-shadow: 0 6px 25px rgba(24, 119, 228, 0.6)
+        filter: brightness(1.1)
+        color: #fff
+
+.btn--success
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%)
+    color: #fff
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4)
+    border: none
+
+    &:hover:not(:disabled)
+        box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6)
+        filter: brightness(1.1)

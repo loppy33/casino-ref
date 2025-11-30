@@ -80,7 +80,7 @@ export default async function ArticlesPage() {
                                     <a href={`/articles/${a.slug}`}>{a.title}</a>
                                 </h3>
                                 <p className="article-card__excerpt">
-                                    {mdToPlain(a.bodyMd).slice(0, 120)}
+                                    {mdToPlain(a.bodyMd).slice(0, 180)}
                                     {a.bodyMd.length > 180 ? "…" : ""}
                                 </p>
                                 <a className="article-card__more" href={`/articles/${a.slug}`}>

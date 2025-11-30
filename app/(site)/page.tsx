@@ -2,28 +2,47 @@ export const dynamic = "force-dynamic";
 
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
-import { mdToPlain } from "@/utils/mdToPlain";
+import MarkdownIt from "markdown-it";
 
+function getMarkdownPreview(md: string, maxChars: number = 1500) {
+	// Убираем лишние пробелы
+	let clean = md.trim();
+
+	// Если длина больше лимита
+	if (clean.length > maxChars) {
+		// Обрезаем до лимита
+		clean = clean.slice(0, maxChars);
+
+		// Обрезаем до последнего пробела, чтобы не резать слово или Markdown
+		const lastSpace = clean.lastIndexOf(" ");
+		if (lastSpace > 0) {
+			clean = clean.slice(0, lastSpace);
+		}
+
+		// Добавляем нормальное многоточие
+		clean += "…";
+	}
+
+	const mdParser = new MarkdownIt({ linkify: true, breaks: true, html: false });
+	return mdParser.render(clean);
+}
 export default async function Home() {
-	// грузим всё параллельно
 	const [topCasinos, popularCategories, latestArticles] = await Promise.all([
 		prisma.casino.findMany({
 			where: { rating: { not: null } },
 			orderBy: { rating: "desc" },
-			take: 4,
-			include: {
-				links: { where: { isPrimary: true }, take: 1 },
-			},
+			take: 8,
+			include: { links: { where: { isPrimary: true }, take: 1 } },
 		}),
 		prisma.category.findMany({
-			take: 4,
-			orderBy: { casinos: { _count: "desc" } }, // популярные по числу казино
+			take: 8,
+			orderBy: { casinos: { _count: "desc" } },
 			include: { _count: { select: { casinos: true } } },
 		}),
 		prisma.article.findMany({
 			where: { published: true },
 			orderBy: { createdAt: "desc" },
-			take: 4,
+			take: 8,
 		}),
 	]);
 
@@ -36,21 +55,41 @@ export default async function Home() {
 					Jouez sur les casinos en ligne <span>France vérifiés</span>
 				</h1>
 				<p className="home-hero__subtitle">
-					Profitez des meilleurs casinos en ligne France, avec des bonus transparents et des retraits rapides. Chaque site est sélectionné pour sa fiabilité et son cadre de jeu sécurisé. Jouez en toute confiance et recevez vos gains sans délai.
+					Profitez des meilleurs casinos en ligne France, avec des bonus transparents et des retraits rapides.
+					Chaque site est sélectionné pour sa fiabilité et son cadre de jeu sécurisé. Jouez en toute confiance et
+					recevez vos gains sans délai.
+				</p>
+				{/* SEO-текст */}
+				<p className="home-hero__seo">
+					Notre plateforme compare les casinos en ligne fiables, offrant des guides complets, des astuces pour
+					maximiser vos gains et des critiques détaillées de chaque casino. Découvrez comment choisir un casino
+					sûr et profiter des meilleures promotions disponibles.
 				</p>
 
 				<div className="home-hero__stats">
 					<div className="stat">
 						<div className="stat__num">{topCasinos.length}</div>
 						<div className="stat__label">Casinos mis en avant</div>
+						<p className="stat__seo">
+							Ces casinos ont été sélectionnés pour leur fiabilité, leur rapidité de paiement et la qualité de leurs
+							bonus.
+						</p>
 					</div>
 					<div className="stat">
 						<div className="stat__num">{popularCategories.length}</div>
 						<div className="stat__label">Catégories populaires</div>
+						<p className="stat__seo">
+							Explorez les catégories les plus populaires, des machines à sous aux jeux de table, pour trouver le
+							casino qui vous convient.
+						</p>
 					</div>
 					<div className="stat">
 						<div className="stat__num">{latestArticles.length}</div>
 						<div className="stat__label">Articles récents</div>
+						<p className="stat__seo">
+							Lisez nos derniers guides et astuces pour comprendre les bonus, tours gratuits et stratégies des
+							casinos en ligne.
+						</p>
 					</div>
 				</div>
 			</section>
@@ -60,7 +99,9 @@ export default async function Home() {
 				<section className="home-section container">
 					<div className="section-head">
 						<h2>Catégories populaires</h2>
-						<a className="section-head__link" href="/categories">Toutes les catégories →</a>
+						<a className="section-head__link" href="/categories">
+							Toutes les catégories →
+						</a>
 					</div>
 
 					<div className="cat-grid">
@@ -80,7 +121,9 @@ export default async function Home() {
 				<section className="home-section container">
 					<div className="section-head">
 						<h2>Top casinos</h2>
-						<a className="section-head__link" href="/casinos">Voir tout →</a>
+						<a className="section-head__link" href="/casinos">
+							Voir tout →
+						</a>
 					</div>
 
 					<div className="casino-grid">
@@ -117,11 +160,19 @@ export default async function Home() {
 										</div>
 									</div>
 
-									{c.shortDesc && <p className="casino-card__desc">{c.shortDesc}</p>}
+									{c.shortDesc && (
+										<p className="casino-card__desc">
+											{c.shortDesc.length > 150 ? c.shortDesc.slice(0, 150) + "…" : c.shortDesc}
+										</p>
+									)}
 
 									<div className="casino-card__actions">
-										<a className="btn btn--primary" href={ctaHref}>Jouer maintenant</a>
-										<a className="btn btn--ghost" href={`/casinos/${c.slug}`}>Détails</a>
+										<a className="btn btn--primary" href={ctaHref}>
+											Jouer maintenant
+										</a>
+										<a className="btn btn--ghost" href={`/casinos/${c.slug}`}>
+											Détails
+										</a>
 									</div>
 								</article>
 							);
@@ -135,21 +186,34 @@ export default async function Home() {
 				<section className="home-section container">
 					<div className="section-head">
 						<h2>Articles récents</h2>
-						<a className="section-head__link" href="/articles">Tous les articles →</a>
+						<a className="section-head__link" href="/articles">
+							Tous les articles →
+						</a>
 					</div>
 
-					<div className="article-grid">
-						{latestArticles.map((a) => (
-							<article key={a.id} className="article-card">
-								<h3 className="article-card__title">
-									<a href={`/articles/${a.slug}`}>{a.title}</a>
-								</h3>
-								<p className="article-card__excerpt">
-									{mdToPlain(a.bodyMd).slice(0, 120)}{a.bodyMd.length > 120 ? "…" : ""}
-								</p>
-								<a className="article-card__more" href={`/articles/${a.slug}`}>Lire →</a>
-							</article>
-						))}
+					<div className="article-main">
+						{latestArticles.map((a) => {
+							const htmlPreview = getMarkdownPreview(a.bodyMd, 1500);
+
+							return (
+								<article key={a.id} className="article-card">
+									<h3 className="article-card__title">
+										<a href={`/articles/${a.slug}`}>{a.title}</a>
+									</h3>
+
+									<article
+										className="article-card"
+										style={{ padding: 16, borderRadius: 14, lineHeight: 1.6, fontSize: "1rem" }}
+									>
+										<div className="prose" dangerouslySetInnerHTML={{ __html: htmlPreview }} />
+									</article>
+
+									<a className="article-card__more" href={`/articles/${a.slug}`}>
+										Lire l’article →
+									</a>
+								</article>
+							);
+						})}
 					</div>
 				</section>
 			)}
