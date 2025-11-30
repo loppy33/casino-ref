@@ -4,7 +4,7 @@ import "./styles/index.sass";
 import AnalyticsClient from "./analytics-client";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Name";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-CJLBD61KDL";
 
 export const metadata: Metadata = {
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
         "machine à sous",
         "blackjack en ligne",
     ],
-    authors: [{ name: "Walixway" }],
-    creator: "Walixway",
-    publisher: "Walixway",
+    authors: [{ name: siteName }],
+    creator: siteName,
+    publisher: siteName,
     openGraph: {
         title: "Top Casinos en ligne France — Bonus & Avis",
         description:

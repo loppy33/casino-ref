@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
 
 export const revalidate = 60; // ISR: обновлять раз в минуту (опционально)
 

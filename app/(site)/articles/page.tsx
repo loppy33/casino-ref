@@ -6,7 +6,7 @@ import { mdToPlain } from "@/utils/mdToPlain";
 import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
 
 export async function generateMetadata(): Promise<Metadata> {
     // Берём последний опубликованный article для более «свежего» OG-preview

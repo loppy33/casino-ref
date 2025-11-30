@@ -23,7 +23,7 @@ function readingTime(text: string) {
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Walixway";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
 
 type Props = { params: { slug: string } };
 
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: { slug?: string } }
 
     if (!article || !article.published) {
         return {
-            title: "Article introuvable — Walixway",
+            title: `Article introuvable — ${siteName}`,
             description: "Cet article est introuvable ou n'est pas publié.",
         };
     }
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: { slug?: string } }
     const ogImage = `${siteUrl}/api/og/article/${slug}`;
 
     return {
-        title: `${article.title} — Walixway`,
+        title: `${article.title} — ${siteName}`,
         description,
         openGraph: {
             title: article.title,
