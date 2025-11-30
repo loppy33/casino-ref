@@ -17,14 +17,13 @@
         // font-size: clamp(15px, 2.5vw, 25px)
         font-size: clamp(15px, 2vw, 20px)
 
-
     .home-hero__seo
         color: var(--sec-text-color)
         font-weight: 400
         margin-bottom: 16px
         // font-size: clamp(10px, 2vw, 20px)
         font-size: clamp(15px, 1.7vw, 17px)
-        
+
     .home-hero__stats
         display: grid
         grid-template-columns: repeat(3, minmax(0,1fr))
@@ -152,6 +151,8 @@
     .btn
         padding: 10px 12px
 
+
+
     .article-main
         display: flex
         flex-direction: column
@@ -165,6 +166,9 @@
                 margin: 0 14px 8px
                 font-size: 2rem
 
+                @media ( max-width: 768px )
+                    font-size: 1.2rem
+
             &__excerpt
                 color: var(--sec-text-color)
 
@@ -172,6 +176,10 @@
                 color: var(--links-text-color)
                 text-decoration: none
                 margin-left: 14px
+    
+        @media ( max-width: 768px )
+            .article-card
+                padding: 10px 0
 
     .article-grid
         display: grid

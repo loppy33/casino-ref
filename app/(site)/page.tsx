@@ -203,7 +203,6 @@ export default async function Home() {
 
 									<article
 										className="article-card"
-										style={{ padding: 16, borderRadius: 14, lineHeight: 1.6, fontSize: "1rem" }}
 									>
 										<div className="prose" dangerouslySetInnerHTML={{ __html: htmlPreview }} />
 									</article>
