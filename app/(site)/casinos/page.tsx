@@ -85,7 +85,7 @@ export default async function CasinosPage() {
 
                 {casinos.length > 0 ? (
                     <div className="casino-grid">
-                        {casinos.map((c) => {
+                        {casinos.map((c: any) => {
                             const primary = c.links?.[0];
                             const ctaHref = primary
                                 ? `/out/${primary.id}?source=all`

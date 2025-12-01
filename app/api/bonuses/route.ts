@@ -21,7 +21,7 @@ export async function GET() {
     });
 
     // Для каждой записи подгрузим affiliate links казино
-    const casinoIds = Array.from(new Set(bonuses.map(b => b.casinoId)));
+    const casinoIds = Array.from(new Set(bonuses.map((b: any) => b.casinoId)));
     const links = await prisma.affiliateLink.findMany({
         where: { casinoId: { in: casinoIds } },
         orderBy: { isPrimary: "desc" }, // первыми — primary
@@ -36,7 +36,7 @@ export async function GET() {
     }
 
     // Соберём ответ
-    const out = bonuses.map(b => ({
+    const out = bonuses.map((b: any) => ({
         id: b.id,
         name: b.name,
         bonusUrl: b.bonusUrl,

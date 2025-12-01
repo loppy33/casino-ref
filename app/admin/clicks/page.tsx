@@ -52,7 +52,7 @@ export default async function ClicksPage({
                     </tr>
                 </thead>
                 <tbody>
-                    {items.map((i) => (
+                    {items.map((i: any) => (
                         <tr key={i.id}>
                             <td>
                                 {new Date(i.createdAt).toLocaleString("ru-RU", {

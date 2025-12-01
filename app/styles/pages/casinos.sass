@@ -11,7 +11,7 @@
             display: grid
             grid-template-columns: 140px 1fr
             gap: 16px
-            align-items: center
+            // align-items: center
         @media (max-width: 640px)
             grid-template-columns: 1fr
         &__logo
@@ -45,6 +45,7 @@
         &__subtitle
             color: var(--sec-text-color)
             max-width: 800px
+            line-height: 1.5rem
         &__chips
             display: flex
             gap: 8px
@@ -135,8 +136,12 @@
                 &:hover
                     text-decoration: underline
 
+    .cp-lists
+        display: flex
+        justify-content: space-between
     .cp-list-block
         margin-top: 10px
+
 
     .cp-list
         list-style: none

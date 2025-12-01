@@ -74,7 +74,7 @@ export default async function ArticlesPage() {
 
                 {articles.length > 0 ? (
                     <div className="article-grid">
-                        {articles.map((a) => (
+                        {articles.map((a: any) => (
                             <article key={a.id} className="article-card">
                                 <h3 className="article-card__title">
                                     <a href={`/articles/${a.slug}`}>{a.title}</a>

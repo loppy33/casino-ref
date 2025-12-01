@@ -2,6 +2,7 @@ import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Stars from "@/components/Stars";
 
 type ParamsP = { slug?: string };
 const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: { params: ParamsP }): Promise
             "jeux d’argent",
             "machines à sous",
             "blackjack en ligne",
-            ...(casino.categories?.map((c) => c.name.toLowerCase()) ?? []),
+            ...(casino.categories?.map((c: any) => c.name.toLowerCase()) ?? []),
         ],
         openGraph: {
             title,
@@ -71,34 +72,7 @@ export async function generateMetadata({ params }: { params: ParamsP }): Promise
         robots: { index: true, follow: true },
     };
 }
-// ── Вспомогалка для звёзд
-function Stars({ rating100 = 0 }: { rating100?: number | null }) {
-    const value = Math.max(0, Math.min(100, rating100 ?? 0));
-    const full = Math.floor(value / 20);
-    const hasHalf = value % 20 >= 10; // если захочешь половинки
-    const total = 5;
 
-    return (
-        <div className="cp-rating" aria-label={`Note ${Math.round(value)}/100`}>
-            {Array.from({ length: total }).map((_, i) => {
-                const filled = i < full || (i === full && hasHalf);
-                return (
-                    <svg
-                        key={i}
-                        className={`cp-rating__star ${filled ? "is-filled" : ""}`}
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                );
-            })}
-            <span className="cp-rating__text">{Math.round(value)}/100</span>
-        </div>
-    );
-}
 
 export default async function CasinoPage({ params }: { params: ParamsP }) {
     const p = (await params) ?? {};
@@ -115,7 +89,7 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
     });
     if (!casino) notFound();
 
-    const categoryIds = casino.categories.map((c) => c.id);
+    const categoryIds = casino.categories.map((c: any) => c.id);
     const similar = categoryIds.length
         ? await prisma.casino.findMany({
             where: {
@@ -230,7 +204,7 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
                                 <li>
                                     <span>Catégories</span>
                                     <b className="cp-cats">
-                                        {casino.categories.map((cat, i) => (
+                                        {casino.categories.map((cat: any, i: any) => (
                                             <a key={cat.id} href={`/categories/${cat.slug}`} className="cp-link">
                                                 {cat.name}
                                                 {i < casino.categories.length - 1 ? ", " : ""}
@@ -245,7 +219,7 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
                             <div className="cp-list-block">
                                 <h3 className="cp-h3 good">Avantages</h3>
                                 <ul className="cp-list cp-list--pros">
-                                    {casino.pros.map((p, i) => (
+                                    {casino.pros.map((p: any, i: any) => (
                                         <li key={i}>{p}</li>
                                     ))}
                                 </ul>
@@ -256,7 +230,7 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
                             <div className="cp-list-block">
                                 <h3 className="cp-h3 bad">Inconvénients</h3>
                                 <ul className="cp-list cp-list--cons">
-                                    {casino.cons.map((c, i) => (
+                                    {casino.cons.map((c: any, i: any) => (
                                         <li key={i}>{c}</li>
                                     ))}
                                 </ul>
@@ -299,7 +273,7 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
 
                 {similar.length ? (
                     <div className="cp-similar__grid">
-                        {similar.map((s) => {
+                        {similar.map((s: any) => {
                             const pl = s.links?.[0];
                             const href = pl ? `/out/${pl.id}?source=similar` : `/casinos/${s.slug}`;
                             return (
@@ -311,7 +285,7 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
                                         <a href={`/casinos/${s.slug}`}>{s.name}</a>
                                     </h3>
                                     <Stars rating100={s.rating ?? 0} />
-                                    {s.shortDesc && <p className="cp-sim-card__desc">{s.shortDesc}</p>}
+                                    {s.shortDesc.length > 150 ? s.shortDesc.slice(0, 150) + "…" : s.shortDesc}
                                     <div className="cp-sim-card__actions">
                                         <a className="btn-primary" href={href}>Jouer</a>
                                         <a className="btn-ghost" href={`/casinos/${s.slug}`}>Détails</a>

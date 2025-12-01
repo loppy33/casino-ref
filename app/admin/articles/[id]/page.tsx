@@ -31,7 +31,7 @@ export default async function EditArticle({
 
     if (!a) notFound();
 
-    const selected = new Set(a.categories.map((c) => c.id));
+    const selected = new Set(a.categories.map((c: any) => c.id));
 
     return (
         <div className="FormPage container">
@@ -49,7 +49,7 @@ export default async function EditArticle({
                 <fieldset>
                     <legend>Категории</legend>
                     <div className="checkbox-list">
-                        {categories.map((c) => (
+                        {categories.map((c: any) => (
                             <label key={c.id} className="checkbox">
                                 <input
                                     type="checkbox"

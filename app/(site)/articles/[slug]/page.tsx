@@ -81,7 +81,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
             id: { not: article.id },
             published: true,
             ...(article.categories.length
-                ? { categories: { some: { id: { in: article.categories.map(c => c.id) } } } }
+                ? { categories: { some: { id: { in: article.categories.map((c: any) => c.id) } } } }
                 : {}),
         },
         orderBy: { createdAt: "desc" },
@@ -123,7 +123,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
             <section className="home-section container" style={{ display: "grid", gap: 16, gridTemplateColumns: "minmax(0, 1fr)" }}>
                 {article.categories.length > 0 && (
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        {article.categories.map(cat => (
+                        {article.categories.map((cat: any) => (
                             <a key={cat.id} href={`/categories/${cat.slug}`} className="cat-card" style={{ padding: "8px 10px" }}>
                                 <span className="cat-card__dot" />
                                 <span className="cat-card__name">{cat.name}</span>
@@ -150,7 +150,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
 
                 {related.length ? (
                     <div className="article-grid article-page">
-                        {related.map(a => (
+                        {related.map((a: any) => (
                             <article key={a.id} className="article-card">
                                 <h3 className="article-card__title">
                                     <a href={`/articles/${a.slug}`}>{a.title}</a>

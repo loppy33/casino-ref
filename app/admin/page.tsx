@@ -140,7 +140,7 @@ export default async function AdminPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {s.topCasinos.map((c, i) => (
+                            {s.topCasinos.map((c: any, i: any) => (
                                 <tr key={i}>
                                     <td>{c.name}</td>
                                     <td className="text-right">{c._count.clicks}</td>
@@ -157,7 +157,7 @@ export default async function AdminPage() {
                 <div className="panel">
                     <h3><Clock size={18} /> Последние переходы</h3>
                     <div className="log-list">
-                        {s.recentClicks.map((click) => (
+                        {s.recentClicks.map((click: any) => (
                             <div key={click.id} className="log-item">
                                 <div className="log-info">
                                     <strong>{click.casino.name}</strong>

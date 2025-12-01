@@ -45,7 +45,7 @@ export default async function NewArticle({
         <fieldset>
           <legend>Категории</legend>
           <div className="checkbox-list">
-            {categories.map((c) => (
+            {categories.map((c: any) => (
               <label key={c.id} className="checkbox">
                 <input type="checkbox" name="categoryIds" value={c.id} /> {c.name}
               </label>

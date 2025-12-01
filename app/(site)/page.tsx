@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Bg from "@/components/Bg";
+import Stars from "@/components/Stars";
 import { prisma } from "@/lib/db";
 import MarkdownIt from "markdown-it";
 
@@ -105,7 +106,7 @@ export default async function Home() {
 					</div>
 
 					<div className="cat-grid">
-						{popularCategories.map((c) => (
+						{popularCategories.map((c: any) => (
 							<a key={c.id} href={`/categories/${c.slug}`} className="cat-card">
 								<span className="cat-card__dot" />
 								<span className="cat-card__name">{c.name}</span>
@@ -127,7 +128,7 @@ export default async function Home() {
 					</div>
 
 					<div className="casino-grid">
-						{topCasinos.map((c) => {
+						{topCasinos.map((c: any) => {
 							const primary = c.links?.[0];
 							const ctaHref = primary ? `/out/${primary.id}?source=seo` : `/casinos/${c.slug}`;
 							return (
@@ -140,23 +141,7 @@ export default async function Home() {
 											<a href={`/casinos/${c.slug}`}>{c.name}</a>
 										</h3>
 										<div className="casino-card__rating">
-											<div className="stars">
-												{Array.from({ length: 5 }).map((_, i) => {
-													const filled = (c.rating ?? 0) / 20 > i;
-													return (
-														<svg
-															key={i}
-															width="18"
-															height="18"
-															viewBox="0 0 24 24"
-															fill={filled ? "#0075ff" : "#9aa1b1"}
-															xmlns="http://www.w3.org/2000/svg"
-														>
-															<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-														</svg>
-													);
-												})}
-											</div>
+											<Stars rating100={c.rating ?? 0} />
 										</div>
 									</div>
 
@@ -192,7 +177,7 @@ export default async function Home() {
 					</div>
 
 					<div className="article-main">
-						{latestArticles.map((a) => {
+						{latestArticles.map((a: any) => {
 							const htmlPreview = getMarkdownPreview(a.bodyMd, 1500);
 
 							return (

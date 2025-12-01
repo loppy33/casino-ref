@@ -96,7 +96,7 @@ export default async function CategoryPage({ params }: { params: ParamsP }) {
                         <h2>Sous-catégories</h2>
                     </div>
                     <div className="cat-grid">
-                        {children.map((c) => (
+                        {children.map((c: any) => (
                             <a key={c.id} href={`/categories/${c.slug}`} className="cat-card">
                                 <span className="cat-card__dot" />
                                 <span className="cat-card__name">{c.name}</span>
@@ -114,7 +114,7 @@ export default async function CategoryPage({ params }: { params: ParamsP }) {
                     </div>
 
                     <div className="casino-grid">
-                        {casinos.map((c) => {
+                        {casinos.map((c: any) => {
                             const primary = c.links?.[0];
                             const ctaHref = primary
                                 ? `/out/${primary.id}?source=category`

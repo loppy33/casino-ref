@@ -56,7 +56,7 @@ export default async function CategoriesPage() {
 
                 {categories.length > 0 ? (
                     <div className="cat-grid">
-                        {categories.map((c) => (
+                        {categories.map((c: any) => (
                             <a key={c.id} href={`/categories/${c.slug}`} className="cat-card">
                                 <span className="cat-card__dot" />
                                 <span className="cat-card__name">{c.name}</span>
