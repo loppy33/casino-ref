@@ -57,22 +57,17 @@
         margin-top: 24px
 
     .section-head
-        display: grid
-        grid-template-columns: 1fr auto
-        align-items: baseline
-        column-gap: 12px
+        display: flex
+        justify-content: space-between
         margin-bottom: 1rem
 
         .home-hero__subtitle
             font-weight: 400
             font-size: 1rem
-        
-        @media (max-width: 560px)
-            .section-head
-                grid-template-columns: 1fr
-                row-gap: 6px
-                &__link
-                    justify-self: start
+
+        @media (max-width: 768px)
+            flex-direction: column
+
     .cat-grid
         display: grid
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
@@ -155,8 +150,6 @@
     .btn
         padding: 10px 12px
 
-
-
     .article-main
         display: flex
         flex-direction: column
@@ -180,7 +173,7 @@
                 color: var(--links-text-color)
                 text-decoration: none
                 margin-left: 14px
-    
+
         @media ( max-width: 768px )
             .article-card
                 padding: 10px 0
