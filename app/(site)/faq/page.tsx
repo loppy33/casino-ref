@@ -1,21 +1,20 @@
-// app/(site)/faq/page.tsx
 import type { Metadata } from "next";
 import { SECTIONS } from "./sections";
 import FaqClient from "./FaqClient";
-
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
 
 export async function generateMetadata(): Promise<Metadata> {
     const ogImage = `${siteUrl}/logo.webp`;
+    const year = new Date().getFullYear();
 
     return {
-        title: `FAQ — ${siteName}`,
+        title: `FAQ Casino en Ligne ${year} — Questions & Réponses`,
         description:
             "FAQ sur les casinos en ligne en France : tout savoir sur la sécurité, les licences, les bonus, les retraits, le KYC et le jeu responsable.",
         openGraph: {
-            title: `FAQ — ${siteName}`,
+            title: `FAQ Casino — ${siteName}`,
             description:
                 "Questions fréquentes sur la sécurité, les bonus, les retraits, le KYC et le jeu responsable",
             url: `${siteUrl}/faq`,
@@ -35,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
+    // Schema.org FAQPage
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -54,7 +54,7 @@ export default function Page() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            {/* Клиентский компонент с логикой поиска, IntersectionObserver и т.д. */}
+            {/* Клиентский компонент */}
             <FaqClient />
         </div>
     );

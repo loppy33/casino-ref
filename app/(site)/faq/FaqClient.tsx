@@ -1,4 +1,3 @@
-// app/(site)/faq/FaqClient.tsx
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -7,9 +6,10 @@ import { SECTIONS } from "./sections";
 
 export default function FaqClient() {
     const [query, setQuery] = useState("");
-    const [active, setActive] = useState(SECTIONS[0].id);
+    const [active, setActive] = useState(SECTIONS[0]?.id || "");
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // Логика фильтрации
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return SECTIONS;
@@ -20,26 +20,41 @@ export default function FaqClient() {
                     (it) => it.q.toLowerCase().includes(q) || it.a.toLowerCase().includes(q)
                 ),
             }))
-            .filter((s) => s.items.length > 0);
+            .filter((s) => s.items.length > 0); // Убираем пустые секции
     }, [query]);
 
+    // IntersectionObserver для подсветки активного пункта меню при скролле
     useEffect(() => {
         const els = Array.from(
             containerRef.current?.querySelectorAll("[data-section]") ?? []
         ) as HTMLElement[];
+        
         if (els.length === 0) return;
+        
         const io = new IntersectionObserver(
             (entries) => {
-                const visible = entries
-                    .filter((e) => e.isIntersecting)
-                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-                if (visible) setActive(visible.target.id);
+                const visible = entries.find((e) => e.isIntersecting);
+                if (visible) {
+                    setActive(visible.target.id);
+                }
             },
-            { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] }
+            { rootMargin: "-100px 0px -70% 0px", threshold: 0 }
         );
+        
         els.forEach((el) => io.observe(el));
         return () => io.disconnect();
     }, [filtered]);
+
+    // Плавный скролл при клике на меню
+    const handleNavClick = (e: React.MouseEvent, id: string) => {
+        e.preventDefault();
+        const el = document.getElementById(id);
+        if (el) {
+            const y = el.getBoundingClientRect().top + window.scrollY - 100; // -100px отступ сверху
+            window.scrollTo({ top: y, behavior: "smooth" });
+            setActive(id);
+        }
+    };
 
     return (
         <div>
@@ -68,7 +83,12 @@ export default function FaqClient() {
                 <aside className="faq-toc" aria-label="Navigation FAQ">
                     <nav>
                         {SECTIONS.map((s) => (
-                            <a key={s.id} href={`#${s.id}`} className={active === s.id ? "is-active" : ""}>
+                            <a 
+                                key={s.id} 
+                                href={`#${s.id}`} 
+                                className={active === s.id ? "is-active" : ""}
+                                onClick={(e) => handleNavClick(e, s.id)}
+                            >
                                 <span className="i">{s.icon}</span>
                                 {s.title}
                             </a>
@@ -110,7 +130,10 @@ export default function FaqClient() {
                                         {it.q}
                                         <span className="arrow" aria-hidden>▾</span>
                                     </summary>
-                                    <div className="faq-a">{it.a}</div>
+                                    <div className="faq-a">
+                                        {/* Если в ответе есть переносы строк, можно рендерить параграфы */}
+                                        {it.a.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+                                    </div>
                                 </details>
                             ))}
                         </section>

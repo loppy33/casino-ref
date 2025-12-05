@@ -34,8 +34,8 @@ export async function generateMetadata(props: { params: ParamsP }): Promise<Meta
             robots: { index: false },
         };
     }
-
-    const title = `Avis ${casino.name} (2026) : Bonus, Arnaque ou Fiable ?`;
+    const year = new Date().getFullYear();
+    const title = `Avis ${casino.name} (${year}) : Bonus, Arnaque ou Fiable ?`;
     const description = casino.shortDesc || `Notre avis complet sur ${casino.name}. Vérifiez la licence, les bonus et les retraits avant de jouer.`;
 
     return {
