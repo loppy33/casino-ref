@@ -42,9 +42,21 @@ export default async function Home() {
             include: { links: { where: { isPrimary: true }, take: 1 } },
         }),
         prisma.category.findMany({
+            // 1. Фильтруем: берем только те, у которых нет родителя
+            where: { parentId: null },
+
             take: 8,
+            // Можно сортировать по количеству подкатегорий или по популярности (кол-ву казино)
             orderBy: { casinos: { _count: "desc" } },
-            include: { _count: { select: { casinos: true } } },
+
+            include: {
+                _count: {
+                    select: {
+                        casinos: true, // Количество казино внутри
+                        children: true // 2. Считаем количество подкатегорий ("детей")
+                    }
+                }
+            },
         }),
         prisma.article.findMany({
             where: { published: true },
@@ -123,12 +135,13 @@ export default async function Home() {
             </section>
 
             {/* CATEGORIES */}
+            {/* CATEGORIES - ОБНОВЛЕННАЯ СЕКЦИЯ */}
             {popularCategories.length > 0 && (
                 <section className="home-section container">
                     <div className="section-head">
-                        <h2>Catégories populaires</h2>
+                        <h2>Популярные разделы</h2>
                         <a className="section-head__link" href="/categories">
-                            Toutes les catégories →
+                            Все категории →
                         </a>
                     </div>
 
@@ -137,6 +150,7 @@ export default async function Home() {
                             <a key={c.id} href={`/categories/${c.slug}`} className="cat-card">
                                 <span className="cat-card__dot" />
                                 <span className="cat-card__name">{c.name}</span>
+
                                 <span className="cat-card__count">{c._count?.casinos ?? 0}</span>
                             </a>
                         ))}
