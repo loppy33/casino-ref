@@ -1,11 +1,13 @@
-// app/categories/page.tsx
-export const dynamic = "force-dynamic";
-
+import { Metadata } from "next";
+import Script from "next/script";
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
-import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+// ISR: Обновляем страницу раз в час (3600 секунд).
+// Это делает загрузку мгновенной для пользователей.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
     title: "Toutes les catégories — Casinos en ligne France",
@@ -24,6 +26,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
+    // Получаем категории, сортируя по количеству казино
     const categories = await prisma.category.findMany({
         orderBy: {
             casinos: {
@@ -32,12 +35,34 @@ export default async function CategoriesPage() {
         },
         include: {
             _count: { select: { casinos: true } },
-            parent: true,
         },
     });
+
+    // Генерация Schema.org для списка коллекций
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Catégories de Casinos",
+        "description": "Liste complète des types de casinos disponibles.",
+        "url": `${siteUrl}/categories`,
+        "hasPart": categories.map((c) => ({
+            "@type": "Collection",
+            "name": c.name,
+            "url": `${siteUrl}/categories/${c.slug}`,
+            "interactionCount": c._count.casinos
+        }))
+    };
+
     return (
         <div className="Home">
             <Bg />
+            
+            {/* Вставка JSON-LD */}
+            <Script
+                id="categories-schema"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
 
             <section className="home-hero container">
                 <h1 className="home-hero__title">
@@ -56,7 +81,7 @@ export default async function CategoriesPage() {
 
                 {categories.length > 0 ? (
                     <div className="cat-grid">
-                        {categories.map((c: any) => (
+                        {categories.map((c) => (
                             <a key={c.id} href={`/categories/${c.slug}`} className="cat-card">
                                 <span className="cat-card__dot" />
                                 <span className="cat-card__name">{c.name}</span>
