@@ -45,7 +45,7 @@ export async function generateMetadata(props: { params: ParamsP }): Promise<Meta
     const plainText = mdToPlain(article.bodyMd);
     const description = plainText.slice(0, 160);
     // Лучше использовать реальную картинку статьи, если она есть в БД (поле imageUrl)
-    const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/logo.webp`; 
+    const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/logo.webp`;
 
     return {
         title: article.title,
@@ -81,10 +81,14 @@ export default async function ArticlePage(props: { params: ParamsP }) {
 
     // Похожие статьи
     const related = await prisma.article.findMany({
-        where: {
+        where: article.categories && article.categories.length > 0 ? {
             id: { not: article.id },
             published: true,
             categories: { some: { id: { in: article.categories.map(c => c.id) } } }
+        } : {
+            id: { not: article.id },
+            published: true,
+            categories: { none: {} } // <-- статьи без категорий
         },
         take: 3,
         orderBy: { createdAt: "desc" }
@@ -117,7 +121,7 @@ export default async function ArticlePage(props: { params: ParamsP }) {
                     <nav className="breadcrumbs">
                         <a href="/">Accueil</a> / <a href="/articles">Articles</a> / <span>{article.title}</span>
                     </nav>
-                    
+
                     <div className="ap-meta">
                         {article.categories[0] && <span className="cat-badge">{article.categories[0].name}</span>}
                         <span className="date">{dateStr}</span>
@@ -143,7 +147,7 @@ export default async function ArticlePage(props: { params: ParamsP }) {
                                 <div className="sw-head">🏆 Top Casino</div>
                                 <div className="sw-body">
                                     <div className="sw-logo">
-                                        <Image src={topCasino.logoUrl || "/placeholder.png"} alt={topCasino.name} fill style={{objectFit: "cover"}} />
+                                        <Image src={topCasino.logoUrl || "/placeholder.png"} alt={topCasino.name} fill style={{ objectFit: "cover" }} />
                                     </div>
                                     <div className="sw-info">
                                         <div className="sw-name">{topCasino.name}</div>
@@ -153,7 +157,7 @@ export default async function ArticlePage(props: { params: ParamsP }) {
                                 </div>
                             </div>
                         )}
-                        
+
                         {/* Виджет "Похожие статьи" */}
                         {related.length > 0 && (
                             <div className="sidebar-list">
