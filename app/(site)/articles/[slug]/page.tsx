@@ -108,7 +108,7 @@ export default async function ArticlePage({ params }: { params: ParamsP }) {
             <Bg />
 
             <section className="home-hero container">
-                <nav className="section-head" aria-label="Fil d’Ariane" style={{ marginBottom: 8 }}>
+                <nav className="section-head2" aria-label="Fil d’Ariane" style={{ marginBottom: 8 }}>
                     <a className="section-head__link" href="/articles">Articles</a>
                     <span style={{ opacity: .6, margin: "0 6px" }}>/</span>
                     <span>{article.title}</span>
