@@ -1,95 +1,63 @@
-import Bg from "@/components/Bg";
-import { prisma } from "@/lib/db";
+import { cache } from "react";
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Script from "next/script";
 import type { Metadata } from "next";
+import { prisma } from "@/lib/db";
+import Bg from "@/components/Bg";
 import Stars from "@/components/Stars";
 
-type ParamsP = { slug?: string };
-const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
-
-// ── SEO: динамические метаданные для страницы казино
-export async function generateMetadata({ params }: { params: ParamsP }): Promise<Metadata> {
-    const resolvedParams = await params;
-    const slug = resolvedParams?.slug;
-    if (!slug) return {};
-
+// --- Кэширование запроса ---
+// Это позволяет вызывать getCasino и в metadata, и в компоненте, 
+// а запрос к БД будет выполнен только один раз.
+const getCasino = cache(async (slug: string) => {
     const casino = await prisma.casino.findUnique({
         where: { slug },
-        include: { categories: true },
+        include: {
+            categories: true,
+            links: { where: { isPrimary: true }, take: 1 },
+        },
     });
+    return casino;
+});
+
+type ParamsP = Promise<{ slug: string }>;
+
+// --- SEO Metadata ---
+export async function generateMetadata(props: { params: ParamsP }): Promise<Metadata> {
+    const { slug } = await props.params;
+    const casino = await getCasino(slug);
 
     if (!casino) {
         return {
-            title: `Casino introuvable — ${siteName}`,
-            description: "Ce casino n’existe pas ou n’est plus disponible.",
+            title: "Casino introuvable",
+            robots: { index: false },
         };
     }
 
-    const title = `${casino.name} — avis, bonus et fiabilité`;
-    const description =
-        casino.shortDesc ||
-        `Découvrez ${casino.name} : avis, licence ${casino.license || "internationale"}, dépôt minimum${casino.minDeposit ? ` ${casino.minDeposit}€` : ""
-        } et sécurité. Jouez en toute confiance sur un site vérifié.`;
-
-    const ogImage = casino.logoUrl
-        ? [{ url: casino.logoUrl, width: 1200, height: 630, alt: casino.name }]
-        : [{ url: `${siteUrl}/logo.webp`, width: 1200, height: 630, alt: siteName }];
-
-    const canonical = `${siteUrl}/casinos/${casino.slug}`;
+    const title = `Avis ${casino.name} (2026) : Bonus, Arnaque ou Fiable ?`;
+    const description = casino.shortDesc || `Notre avis complet sur ${casino.name}. Vérifiez la licence, les bonus et les retraits avant de jouer.`;
 
     return {
         title,
         description,
-        keywords: [
-            casino.name,
-            "casino en ligne",
-            "bonus casino",
-            "casino France",
-            "jeux d’argent",
-            "machines à sous",
-            "blackjack en ligne",
-            ...(casino.categories?.map((c: any) => c.name.toLowerCase()) ?? []),
-        ],
         openGraph: {
             title,
             description,
-            type: "website",
-            url: canonical,
-            siteName,
-            locale: "fr_FR",
-            images: ogImage,
+            images: [{ url: casino.logoUrl || "/logo.png", width: 1200, height: 630 }],
         },
-        twitter: {
-            card: "summary_large_image",
-            title,
-            description,
-            images: ogImage.map((i) => i.url),
-        },
-        alternates: { canonical },
-        robots: { index: true, follow: true },
     };
 }
 
+// --- Компонент Страницы ---
+export default async function CasinoPage(props: { params: ParamsP }) {
+    const { slug } = await props.params;
+    const casino = await getCasino(slug);
 
-export default async function CasinoPage({ params }: { params: ParamsP }) {
-    const p = (await params) ?? {};
-    const slug = first(p.slug);
-    if (!slug) notFound();
-
-    // Тянем казино + «похожие» (из тех же категорий), без текущего
-    const casino = await prisma.casino.findUnique({
-        where: { slug },
-        include: {
-            links: { where: { isPrimary: true }, take: 1 },
-            categories: true,
-        },
-    });
     if (!casino) notFound();
 
-    const categoryIds = casino.categories.map((c: any) => c.id);
+    // Поиск похожих казино
+    const categoryIds = casino.categories.map((c) => c.id);
     const similar = categoryIds.length
         ? await prisma.casino.findMany({
             where: {
@@ -98,210 +66,219 @@ export default async function CasinoPage({ params }: { params: ParamsP }) {
                 rating: { not: null },
             },
             orderBy: { rating: "desc" },
-            include: { links: { where: { isPrimary: true }, take: 1 } },
-            take: 6,
+            take: 4, // 4 выглядят лучше в сетке
         })
         : [];
 
-    const primary = casino.links?.[0];
-    const ctaHref = primary ? `/out/${primary.id}?source=detail` : "#";
+    const primaryLink = casino.links?.[0];
+    const ctaHref = primaryLink ? `/out/${primaryLink.id}?source=detail` : "#";
 
-    // JSON-LD (Organization + AggregateRating) + Breadcrumbs
+    // --- Schema.org: Review & Product ---
+    // Это критически важно для звездочек в Google
     const jsonLd = {
-        "@context": "https://schema.org",
-        "@graph": [
-            {
-                "@type": "BreadcrumbList",
-                itemListElement: [
-                    { "@type": "ListItem", position: 1, name: "Casinos", item: `${siteUrl}/casinos` },
-                    { "@type": "ListItem", position: 2, name: casino.name, item: `${siteUrl}/casinos/${casino.slug}` },
-                ],
-            },
-            {
-                "@type": "Organization",
-                name: casino.name,
-                url: `${siteUrl}/casinos/${casino.slug}`,
-                logo: casino.logoUrl || undefined,
-                aggregateRating:
-                    typeof casino.rating === "number"
-                        ? {
-                            "@type": "AggregateRating",
-                            ratingValue: (casino.rating / 20).toFixed(1), // 0..5
-                            bestRating: "5",
-                            worstRating: "0",
-                            ratingCount: 1,
-                        }
-                        : undefined,
-            },
-        ],
+        "@context": "https://schema.org/",
+        "@type": "Review",
+        "itemReviewed": {
+            "@type": "Organization", // Или "Casino" если поддерживается, но Organization надежнее
+            "name": casino.name,
+            "image": casino.logoUrl,
+            "description": casino.shortDesc
+        },
+        "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": (casino.rating ? casino.rating / 20 : 0).toFixed(1), // 0-5
+            "bestRating": "5",
+            "worstRating": "1"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": process.env.NEXT_PUBLIC_SITE_NAME || "CasinoSearch"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": process.env.NEXT_PUBLIC_SITE_NAME || "CasinoSearch"
+        }
     };
 
     return (
         <div className="CasinoPage">
             <Bg />
 
-            {/* JSON-LD */}
-            <script
+            {/* SEO Schema */}
+            <Script
+                id="review-schema"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
 
-            {/* HERO */}
-            <section className="cp-hero container">
-                <nav className="cp-breadcrumbs" aria-label="Fil d’Ariane">
-                    <a href="/casinos">Casinos</a>
-                    <span aria-hidden="true">/</span>
-                    <span className="current" aria-current="page">
-                        {casino.name}
-                    </span>
-                </nav>
+            {/* HERO SECTION */}
+            <div className="cp-header-wrapper">
+                <section className="cp-hero container">
+                    {/* Breadcrumbs */}
+                    <nav className="cp-breadcrumbs">
+                        <a href="/">Accueil</a>
+                        <span className="sep">/</span>
+                        <a href="/casinos">Casinos</a>
+                        <span className="sep">/</span>
+                        <span className="current">{casino.name}</span>
+                    </nav>
 
-                <div className="cp-hero__top">
-                    <div className="cp-hero__logo" aria-hidden>
-                        {casino.logoUrl ? (
-                            <img src={casino.logoUrl} alt="" />
-                        ) : (
-                            <div className="cp-hero__logo--placeholder" />
-                        )}
-                    </div>
-
-                    <div className="cp-hero__meta">
-                        <h1 className="cp-hero__title">{casino.name}</h1>
-                        <Stars rating100={casino.rating ?? 0} />
-                        {casino.shortDesc && <p className="cp-hero__subtitle">{casino.shortDesc}</p>}
-
-                        <div className="cp-hero__chips">
-                            {casino.license && <span className="chip chip--license">Licence: {casino.license}</span>}
-                            {typeof casino.minDeposit === "number" && (
-                                <span className="chip">Dépôt min: {casino.minDeposit}€</span>
-                            )}
-                            {casino.is18plus && <span className="chip chip--18plus">18+</span>}
+                    <div className="cp-hero__main">
+                        <div className="cp-hero__logo-box">
+                            <Image
+                                src={casino.logoUrl || "/placeholder.png"}
+                                alt={`Logo ${casino.name}`}
+                                fill
+                                style={{ objectFit: "cover" }}
+                                sizes="(max-width: 768px) 100px, 160px"
+                                priority // Грузим логотип сразу, это LCP
+                            />
                         </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* CONTENT */}
-            <section className="cp-content container">
-                <div className="cp-grid">
-                    {/* ЛЕВАЯ КОЛОНКА: факты / плюсы / минусы */}
-                    <article className="cp-card">
-                        <h2 className="cp-h2">Informations clés</h2>
-                        <ul className="cp-facts">
-                            {casino.license && (
-                                <li>
-                                    <span>Licence</span>
-                                    <b>{casino.license}</b>
-                                </li>
-                            )}
-                            {typeof casino.minDeposit === "number" && (
-                                <li>
-                                    <span>Dépôt minimum</span>
-                                    <b>{casino.minDeposit}€</b>
-                                </li>
-                            )}
-                            {casino.categories.length > 0 && (
-                                <li>
-                                    <span>Catégories</span>
-                                    <b className="cp-cats">
-                                        {casino.categories.map((cat: any, i: any) => (
-                                            <a key={cat.id} href={`/categories/${cat.slug}`} className="cp-link">
-                                                {cat.name}
-                                                {i < casino.categories.length - 1 ? ", " : ""}
-                                            </a>
-                                        ))}
-                                    </b>
-                                </li>
-                            )}
-                        </ul>
-
-                        {casino.pros?.length ? (
-                            <div className="cp-list-block">
-                                <h3 className="cp-h3 good">Avantages</h3>
-                                <ul className="cp-list cp-list--pros">
-                                    {casino.pros.map((p: any, i: any) => (
-                                        <li key={i}>{p}</li>
-                                    ))}
-                                </ul>
+                        <div className="cp-hero__info">
+                            <h1 className="cp-hero__title">
+                                Avis <span>{casino.name}</span>
+                            </h1>
+                            <div className="cp-hero__rating-row">
+                                <Stars rating100={casino.rating ?? 0} />
+                                <span className="score">{(casino.rating ? casino.rating / 20 : 0).toFixed(1)}/5</span>
                             </div>
-                        ) : null}
 
-                        {casino.cons?.length ? (
-                            <div className="cp-list-block">
-                                <h3 className="cp-h3 bad">Inconvénients</h3>
-                                <ul className="cp-list cp-list--cons">
-                                    {casino.cons.map((c: any, i: any) => (
-                                        <li key={i}>{c}</li>
-                                    ))}
-                                </ul>
+                            <div className="cp-chips">
+                                {casino.license && <span className="chip chip--license">🛡 {casino.license}</span>}
+                                {typeof casino.minDeposit === 'number' && <span className="chip">💶 Dépôt min: {casino.minDeposit}€</span>}
+                                <span className="chip chip--verified">✅ Vérifié</span>
                             </div>
-                        ) : null}
-                    </article>
+                        </div>
 
-                    {/* ПРАВАЯ КОЛОНКА: блок действия (липкий) */}
-                    <aside className="cp-sticky">
-                        <div className="cp-card cp-sticky__card" role="complementary" aria-label="Action">
-                            <div className="cp-sticky__logo" aria-hidden>
-                                {casino.logoUrl ? <img src={casino.logoUrl} alt="" /> : <div className="ph" />}
-                            </div>
-                            <div className="cp-sticky__title">{casino.name}</div>
-                            <Stars rating100={casino.rating ?? 0} />
-                            <a className="btn-primary btn-primary--wide" href={ctaHref}>
-                                Jouer maintenant
+                        <div className="cp-hero__cta desktop-only">
+                            <a className="btn-shine" href={ctaHref} target="_blank" rel="nofollow">
+                                Jouer Maintenant
                             </a>
-                            {primary && (
-                                <a className="btn-ghost btn-ghost--wide" href={`/out/${primary.id}?source=detail`} target="_blank">
-                                    Visiter le site
-                                </a>
-                            )}
-                            <p className="cp-sticky__note">Jeu responsable. 18+.</p>
+                            <div className="sub-cta">Inscription en 2 min</div>
                         </div>
-                    </aside>
-                </div>
-            </section>
-
-            {/* SIMILAIRES */}
-            <section className="cp-similar container">
-                <div className="cp-similar__head">
-                    <h2 className="cp-h2">Casinos similaires</h2>
-                    {casino.categories[0] && (
-                        <a className="cp-link" href={`/categories/${casino.categories[0].slug}`}>
-                            Voir la catégorie →
-                        </a>
-                    )}
-                </div>
-
-                {similar.length ? (
-                    <div className="cp-similar__grid">
-                        {similar.map((s: any) => {
-                            const pl = s.links?.[0];
-                            const href = pl ? `/out/${pl.id}?source=similar` : `/casinos/${s.slug}`;
-                            return (
-                                <article key={s.id} className="cp-sim-card">
-                                    <div className="cp-sim-card__logo" aria-hidden>
-                                        {s.logoUrl ? <img src={s.logoUrl} alt="" /> : <div className="ph" />}
-                                    </div>
-                                    <h3 className="cp-sim-card__title">
-                                        <a href={`/casinos/${s.slug}`}>{s.name}</a>
-                                    </h3>
-                                    <Stars rating100={s.rating ?? 0} />
-                                    {s.shortDesc.length > 150 ? s.shortDesc.slice(0, 150) + "…" : s.shortDesc}
-                                    <div className="cp-sim-card__actions">
-                                        <a className="btn-primary" href={href}>Jouer</a>
-                                        <a className="btn-ghost" href={`/casinos/${s.slug}`}>Détails</a>
-                                    </div>
-                                </article>
-                            );
-                        })}
                     </div>
-                ) : (
-                    <p className="cp-empty">Aucun casino similaire pour l’instant.</p>
-                )}
-            </section>
+                </section>
+            </div>
 
-            {/* МОБИЛЬНЫЙ ЛИПКИЙ CTA */}
-            <div className="cp-mobile-cta">
-                <a className="btn-primary btn-primary--full" href={ctaHref}>Jouer maintenant</a>
+            <div className="container cp-layout">
+                {/* LEFT CONTENT */}
+                <main className="cp-main">
+                    {/* ПЛЮСЫ И МИНУСЫ (Grid Layout) */}
+                    <section className="cp-card cp-pros-cons">
+                        <div className="pc-col">
+                            <h3>👍 Avantages</h3>
+                            <ul>
+                                {casino.pros?.map((p, i) => <li key={i}>{p}</li>)}
+                                {!casino.pros?.length && <li>Excellente réputation</li>}
+                            </ul>
+                        </div>
+                        <div className="pc-divider"></div>
+                        <div className="pc-col">
+                            <h3>👎 Inconvénients</h3>
+                            <ul className="cons-list">
+                                {casino.cons?.map((c, i) => <li key={i}>{c}</li>)}
+                                {!casino.cons?.length && <li>Peu de filtres de jeux</li>}
+                            </ul>
+                        </div>
+                    </section>
+
+                    {/* DETAILS TABLE */}
+                    <section className="cp-card cp-details">
+                        <h2>Détails du casino</h2>
+                        <div className="detail-row">
+                            <span className="label">Site Web</span>
+                            <a href={ctaHref} target="_blank" rel="nofollow" className="value link">{casino.name}</a>
+                        </div>
+                        <div className="detail-row">
+                            <span className="label">Licence</span>
+                            <span className="value">{casino.license || "N/A"}</span>
+                        </div>
+                        <div className="detail-row">
+                            <span className="label">Catégories</span>
+                            <div className="value tags">
+                                {casino.categories.map(c => (
+                                    <a key={c.id} href={`/categories/${c.slug}`}>{c.name}</a>
+                                ))}
+                            </div>
+                        </div>
+                        {casino.shortDesc && (
+                            <div className="detail-desc">
+                                <h3>Notre avis</h3>
+                                <p>{casino.shortDesc}</p>
+                            </div>
+                        )}
+                    </section>
+                </main>
+
+                {/* RIGHT SIDEBAR (Sticky) */}
+                <aside className="cp-sidebar">
+                    <div className="sticky-wrapper">
+                        <div className="cp-card widget-play">
+                            <div className="widget-logo">
+                                <Image
+                                    src={casino.logoUrl || "/placeholder.png"}
+                                    alt={casino.name}
+                                    fill
+                                    style={{ objectFit: "cover" }}
+                                />
+                            </div>
+                            <div className="widget-score">
+                                <span>Note globale</span>
+                                <strong>{(casino.rating ? casino.rating / 20 : 0).toFixed(1)}/5</strong>
+                            </div>
+                            <a className="btn-shine full-width" href={ctaHref} target="_blank" rel="nofollow">
+                                Visiter le site
+                            </a>
+                            <p className="terms">18+ Jouez de manière responsable.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            {/* SIMILAR CASINOS */}
+            {similar.length > 0 && (
+                <section className="container cp-similar">
+                    <h2>Vous aimerez aussi</h2>
+                    <div className="similar-grid">
+                        {similar.map((s) => (
+                            <a key={s.id} href={`/casinos/${s.slug}`} className="sim-card">
+                                <div className="sim-logo">
+                                    <Image
+                                        src={s.logoUrl || "/placeholder.png"}
+                                        alt={s.name}
+                                        fill
+                                        style={{ objectFit: "cover" }}
+                                        sizes="200px"
+                                    />
+                                </div>
+                                <div className="sim-info">
+                                    <div className="name">{s.name}</div>
+                                    <Stars rating100={s.rating ?? 0} />
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* MOBILE FLOATING CTA */}
+            <div className="mobile-sticky-footer">
+                <div className="ms-info">
+                    <div className="ms-img">
+                        <Image
+                            src={casino.logoUrl || "/placeholder.png"}
+                            alt=""
+                            width={40} height={40}
+                            style={{ borderRadius: "8px" }}
+                        />
+                    </div>
+                    <div className="ms-text">
+                        <span>Bonus exclusif</span>
+                        <strong>{casino.name}</strong>
+                    </div>
+                </div>
+                <a href={ctaHref} className="btn-shine small">Jouer</a>
             </div>
         </div>
     );

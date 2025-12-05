@@ -2,57 +2,52 @@
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "NAME";
 
 import { useEffect, useState } from "react";
-import Link from "next/link"; // 👈 Импортируем Link
+import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation"; // 1. Импортируем хук
 import SpinBonus from "@/components/SpinBonus";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
     const [scrolled, setScrolled] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // 👈 State для меню
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    
+    // 2. Получаем текущий путь
+    const pathname = usePathname();
 
-    // Эффект для "scrolled" хедера
+    // 3. Проверяем, находимся ли мы на странице детального казино
+    // Логика: путь начинается с "/casinos/" И это не просто страница списка "/casinos"
+    const isCasinoDetailPage = pathname?.startsWith("/casinos/") && pathname !== "/casinos";
+
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener("scroll", onScroll);
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // 👈 Эффект для блокировки скролла body, когда меню открыто
     useEffect(() => {
         document.body.classList.toggle('menu-is-open', isMenuOpen);
-
-        // Очистка при размонтировании
         return () => {
             document.body.classList.remove('menu-is-open');
         };
     }, [isMenuOpen]);
 
-    // 👈 Функция для переключения меню
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    // 👈 Функция для закрытия меню (используется на ссылках)
     const closeMenu = () => {
         setIsMenuOpen(false);
     };
 
     return (
         <>
-            {/* Добавляем класс, когда меню открыто, для стилизации (например, z-index) */}
             <header className={`site-header ${scrolled ? "is-scrolled" : ""} ${isMenuOpen ? "is-menu-open" : ""}`}>
                 <div className="container site-header__inner">
-                    <Link href="/" className="site-header__logo" onClick={closeMenu}> {/* 👈 Меняем <a> на Link и добавляем onClick */}
-                        <img src="/logoHeader.webp" alt={siteName} /> {/* 👈 Добавлен alt */}
+                    <Link href="/" className="site-header__logo" onClick={closeMenu}>
+                        <img src="/logoHeader.webp" alt={siteName} />
                         {siteName}
                     </Link>
 
-                    {/* 
-                      👇 Навигация
-                      - Добавлен класс .is-open
-                      - <a> заменены на <Link>
-                      - Добавлен onClick={closeMenu} для закрытия меню при клике на ссылку
-                    */}
                     <nav className={`site-header__nav ${isMenuOpen ? "is-open" : ""}`}>
                         <Link href="/casinos" onClick={closeMenu}>Casinos</Link>
                         <Link href="/categories" onClick={closeMenu}>Catégories</Link>
@@ -60,12 +55,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                         <Link href="/faq" onClick={closeMenu}>Faq</Link>
                     </nav>
 
-                    {/* 
-                      👇 Кнопка Бургер
-                      - Появляется только на мобильных
-                      - Управляет состоянием isMenuOpen
-                      - aria-label и aria-expanded для доступности (Accessibility)
-                    */}
                     <button
                         className={`site-header__burger ${isMenuOpen ? "is-open" : ""}`}
                         onClick={toggleMenu}
@@ -94,15 +83,15 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
             <main>
                 {children}
-                <SpinBonus />
+                
+                {/* 4. Рендерим SpinBonus ТОЛЬКО если это НЕ детальная страница казино */}
+                {!isCasinoDetailPage && <SpinBonus />}
             </main>
 
             <footer className="site-footer">
                 <div className="container footer__inner">
-                    {/* Logo + description */}
                     <div className="footer__brand">
                         <a href="/" className="footer__logo">
-
                             <Image
                                 src="/logo.webp"
                                 alt="Casino Search"
@@ -117,7 +106,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                         </p>
                     </div>
 
-                    {/* Navigation */}
                     <nav className="footer__nav">
                         <div>
                             <h4>Explorer</h4>
@@ -162,7 +150,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
                     </nav>
                 </div>
 
-                {/* Bottom line */}
                 <div className="footer__bottom">
                     <div className="container">
                         <p>

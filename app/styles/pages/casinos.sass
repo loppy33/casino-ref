@@ -1,298 +1,342 @@
+// --- Variables ---
+$bg-card: rgba(30, 32, 40, 0.7)
+$border-light: 1px solid rgba(255, 255, 255, 0.08)
+$primary: var(--main-color)
+$text-main: var(--main-text-color)
+$text-sec: var(--sec-text-color)
+
 .CasinoPage
+  padding-top: 50vh
+  padding-bottom: 80px
+
+  // --- Hero Section ---
+  .cp-header-wrapper
+    margin-bottom: 40px
+
+  .cp-breadcrumbs
+    display: flex
+    gap: 8px
+    font-size: 0.9rem
+    color: $text-sec
+    margin-bottom: 24px
+
+    a
+      color: $text-sec
+      text-decoration: none
+      &:hover
+        color: #fff
+
+    .current
+      color: #fff
+      font-weight: 500
+
+    .sep
+      color: rgba(255, 255, 255, 0.2)
+
+  .cp-hero__main
+    display: flex
+    align-items: center
+    gap: 30px
+
+    @media (max-width: 768px)
+      flex-direction: column
+      text-align: center
+
+  .cp-hero__logo-box
     position: relative
-    color: var(--main-text-color)
-    padding-top: 50vh
+    width: 160px
+    height: 160px
+    flex-shrink: 0
+    border-radius: 24px
+    overflow: hidden
+    background: #2a2d36
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3)
+    border: 1px solid rgba(255,255,255,0.1)
 
-    .cp-hero
+    @media (max-width: 768px)
+      width: 100px
+      height: 100px
+
+  .cp-hero__info
+    flex-grow: 1
+
+  .cp-hero__title
+    font-size: clamp(2rem, 4vw, 3.5rem)
+    margin: 0 0 10px
+    font-weight: 800
+    line-height: 1.1
+    span
+      color: $primary
+
+  .cp-hero__rating-row
+    display: flex
+    align-items: center
+    gap: 12px
+    margin-bottom: 16px
+
+    @media (max-width: 768px)
+      justify-content: center
+
+    .score
+      background: rgba(255,255,255,0.1)
+      padding: 4px 8px
+      border-radius: 6px
+      font-weight: 700
+      font-size: 0.9rem
+
+  .cp-chips
+    display: flex
+    gap: 10px
+    flex-wrap: wrap
+    @media (max-width: 768px)
+      justify-content: center
+
+  .chip
+    background: rgba(255,255,255,0.05)
+    border: $border-light
+    padding: 6px 12px
+    border-radius: 100px
+    font-size: 0.85rem
+    color: $text-sec
+
+    &--license
+      color: #fff
+      background: rgba(0,0,0,0.2)
+    &--verified
+      color: #4ade80
+      background: rgba(74, 222, 128, 0.1)
+      border-color: rgba(74, 222, 128, 0.2)
+
+  // --- Layout & Main Content ---
+  .cp-layout
+    display: grid
+    grid-template-columns: 1fr 340px
+    gap: 30px
+    align-items: start
+
+    @media (max-width: 900px)
+      grid-template-columns: 1fr
+
+  .cp-card
+    background: var(--content-bg-color)
+    border: $border-light
+    border-radius: 20px
+    padding: 24px
+    margin-bottom: 24px
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1)
+
+  // --- Pros & Cons ---
+  .cp-pros-cons
+    display: grid
+    grid-template-columns: 1fr auto 1fr
+    gap: 20px
+
+    @media (max-width: 600px)
+      grid-template-columns: 1fr
+      gap: 0
+
+    h3
+      margin-top: 0
+      font-size: 1.2rem
+      margin-bottom: 16px
+
+    ul
+      list-style: none
+      padding: 0
+      margin: 0
+      li
         position: relative
-        z-index: 2
-        padding: 18vh 1rem 24px
-        &__top
-            display: grid
-            grid-template-columns: 140px 1fr
-            gap: 16px
-            // align-items: center
-        @media (max-width: 640px)
-            grid-template-columns: 1fr
-        &__logo
-            width: 140px
-            height: 140px
-            border-radius: 16px
-            overflow: hidden
-            box-shadow: 0 8px 24px rgba(0,0,0,.25)
-            background: rgba(255,255,255,.04)
-            img
-                width: 100%
-                height: 100%
-                object-fit: cover
-        &__logo--placeholder
-            width: 140px
-            height: 140px
-            border-radius: 16px
-            background: rgba(255,255,255,.06)
-        &__meta
-            display: flex
-            flex-direction: column
-            gap: 10px
-            line-height: 1
+        padding-left: 24px
+        margin-bottom: 10px
+        color: $text-sec
+        &:before
+          content: "✓"
+          position: absolute
+          left: 0
+          color: #4ade80
+          font-weight: bold
 
-        &__title
-            margin: 0
-            font-size: clamp(30px, 5vw, 42px)
-            color: var(--main-text-color)
-            span
-                color: var(--main-color)
-        &__subtitle
-            color: var(--sec-text-color)
-            max-width: 800px
-            line-height: 1.5rem
-        &__chips
-            display: flex
-            gap: 8px
-            flex-wrap: wrap
+    .cons-list li:before
+      content: "×"
+      color: #f87171
+      font-size: 1.2em
+      line-height: 1
 
-    .chip
-        background: var(--content-bg-color)
-        border: 1px solid rgba(255,255,255,.07)
-        color: var(--sec-text-color)
-        padding: 6px 10px
-        border-radius: 999px
-        font-size: .9rem
-        &--license
-            color: var(--white-color)
-            background: linear-gradient(0deg, rgba(0,0,0,.12), rgba(0,0,0,.12)), var(--main-color)
-        &--18plus
-            border-color: rgba(231, 76, 60, .35)
-            color: #ffb3b3
+  .pc-divider
+    width: 1px
+    background: rgba(255,255,255,0.1)
+    @media (max-width: 600px)
+      width: 100%
+      height: 1px
+      margin: 20px 0
 
-    .cp-rating
-        display: inline-flex
-        align-items: center
-        gap: 6px
-        &__star
-            fill: #9aa1b1
-            transition: fill .2s ease
-            &.is-filled
-                fill: #0075ff
-        &__text
-            color: var(--sec-text-color)
-            font-size: .95rem
+  // --- Details Table ---
+  .detail-row
+    display: flex
+    justify-content: space-between
+    padding: 12px 0
+    border-bottom: 1px solid rgba(255,255,255,0.05)
+    &:last-child
+      border-bottom: none
 
-    .cp-content
-        max-width: 1120px
-        margin: 20px auto 8px
+    .label
+      color: $text-sec
+    .value
+      font-weight: 600
+      text-align: right
+    .link
+      color: $primary
+      text-decoration: none
 
-    .cp-grid
-        display: grid
-        grid-template-columns: minmax(0, 720px) 340px
-        align-items: start
-        gap: 16px
-        justify-content: center
-        @media (max-width: 1200px)
-            grid-template-columns: minmax(0, 640px) 320px
-        @media (max-width: 960px)
-            grid-template-columns: 1fr
-
-    .cp-card
-        background: var(--content-bg-color)
-        border-radius: 16px
-        padding: 16px
-        box-shadow: 0 8px 24px rgba(0,0,0,.16)
-        width: 100%
-
-    .cp-h2
-        margin: 0 0 10px
-        font-size: 1.4rem
-        color: var(--main-text-color)
-
-    .cp-h3
-        margin: 10px 0 8px
-        font-size: 1.1rem
-        &.good
-            color: #28a745
-        &.bad
-            color: #e74c3c
-
-    .cp-facts
-        list-style: none
-        margin: 0
-        padding: 0
-        li
-            display: grid
-            grid-template-columns: 180px 1fr
-            gap: 10px
-            padding: 10px 0
-            border-bottom: 1px solid rgba(255,255,255,.06)
-            &:last-child
-                border-bottom: 0
-            span
-                color: var(--sec-text-color)
-            b
-                color: var(--white-color)
-        .cp-cats
-            a
-                color: var(--links-text-color)
-                text-decoration: none
-                &:hover
-                    text-decoration: underline
-
-    .cp-lists
-        display: flex
-        justify-content: space-between
-    .cp-list-block
-        margin-top: 10px
-
-
-    .cp-list
-        list-style: none
-        padding: 0
-        margin: 0
-        li
-            position: relative
-            padding-left: 20px
-            margin: 6px 0
-            &:before
-                content: ""
-                position: absolute
-                left: 0
-                top: 8px
-                width: 8px
-                height: 8px
-                border-radius: 2px
-                background: rgba(255,255,255,.25)
-        &--pros li:before
-            background: #28a745
-        &--cons li:before
-            background: #e74c3c
-
-    .cp-sticky
-        position: sticky
-        top: 100px
-        &__card
-            display: flex
-            flex-direction: column
-            align-items: center
-            gap: 10px
-            text-align: center
-            width: 100%
-            margin-left: auto
-            margin-right: auto
-        &__logo
-            width: 80px
-            height: 80px
-            border-radius: 12px
-            overflow: hidden
-            background: rgba(255,255,255,.06)
-            img
-                width: 100%
-                height: 100%
-                object-fit: cover
-            .ph
-                width: 100%
-                height: 100%
-                background: rgba(255,255,255,.05)
-        &__title
-            font-weight: 600
-        &__note
-            color: var(--sec-text-color)
-            font-size: .9rem
-
-    .btn-primary, .btn-ghost
-        padding: 10px 14px
-        border-radius: 12px
+    .tags
+      display: flex
+      gap: 6px
+      flex-wrap: wrap
+      justify-content: flex-end
+      a
+        font-size: 0.8rem
+        background: rgba(255,255,255,0.1)
+        padding: 2px 8px
+        border-radius: 6px
+        color: #fff
         text-decoration: none
+
+  .detail-desc
+    padding-top: 20px
+    color: $text-sec
+    line-height: 1.6
+    h3
+      color: #fff
+      font-size: 1.1rem
+      margin-bottom: 10px
+
+  // --- Sticky Sidebar Widget ---
+  .cp-sidebar
+    position: sticky
+    top: 100px
+
+  .widget-play
+    text-align: center
+    .widget-logo
+      position: relative
+      width: 80px
+      height: 80px
+      margin: 0 auto 16px
+      border-radius: 16px
+      overflow: hidden
+    .widget-score
+      margin-bottom: 20px
+      span
+        display: block
+        font-size: 0.9rem
+        color: $text-sec
+      strong
+        font-size: 1.5rem
+        color: #fff
+    .terms
+      margin-top: 12px
+      font-size: 0.75rem
+      color: rgba(255,255,255,0.3)
+
+  // --- Buttons ---
+  .btn-shine
+    display: inline-flex
+    justify-content: center
+    align-items: center
+    background: $primary
+    color: #fff
+    font-weight: 700
+    text-decoration: none
+    padding: 14px 30px
+    border-radius: 12px
+    transition: transform 0.2s
+    position: relative
+    overflow: hidden
+
+    &:hover
+      transform: translateY(-2px)
+      filter: brightness(1.1)
+
+    &.full-width
+      width: 100%
+    &.small
+      padding: 10px 20px
+      font-size: 0.9rem
+
+  .desktop-only
+    @media (max-width: 768px)
+      display: none
+
+  .sub-cta
+    margin-top: 8px
+    font-size: 0.8rem
+    color: $text-sec
+    text-align: center
+
+  // --- Similar Grid ---
+  .similar-grid
+    display: grid
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
+    gap: 16px
+    margin-top: 20px
+
+  .sim-card
+    background: var(--content-bg-color)
+    border-radius: 16px
+    padding: 12px
+    text-decoration: none
+    transition: background 0.2s
+    border: $border-light
+
+    &:hover
+      background: rgba(255,255,255,0.05)
+
+    .sim-logo
+      position: relative
+      width: 100%
+      aspect-ratio: 16/9
+      border-radius: 10px
+      overflow: hidden
+      margin-bottom: 10px
+    .sim-info
+      .name
+        color: #fff
         font-weight: 600
-        transition: filter .2s ease, background .2s ease, border-color .2s ease
-        display: inline-flex
-        align-items: center
-        justify-content: center
+        margin-bottom: 4px
 
-    .btn-primary
-        background: var(--main-color)
-        color: var(--white-color)
-        &:hover
-            filter: brightness(1.08)
+  // --- Mobile Sticky Footer (Glassmorphism) ---
+  .mobile-sticky-footer
+    display: none
+    position: fixed
+    bottom: 16px
+    left: 16px
+    right: 16px
+    background: rgba(20, 20, 25, 0.85)
+    backdrop-filter: blur(12px)
+    -webkit-backdrop-filter: blur(12px)
+    border: 1px solid rgba(255,255,255,0.1)
+    padding: 10px 16px
+    border-radius: 16px
+    z-index: 100
+    align-items: center
+    justify-content: space-between
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5)
 
-    .btn-ghost
-        background: transparent
-        color: var(--main-text-color)
-        border: 1px solid rgba(255,255,255,.12)
-        &:hover
-            background: rgba(255,255,255,.06)
+    @media (max-width: 768px)
+      display: flex
 
-    .btn-primary--wide, .btn-ghost--wide
-        width: 100%
-
-    .cp-similar
-        max-width: 1120px
-        margin: 24px auto 80px
-        &__head
-            display: flex
-            align-items: baseline
-            justify-content: space-between
-            margin-bottom: 10px
-        &__grid
-            display: grid
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
-            gap: 12px
-
-    .cp-sim-card
-        background: var(--content-bg-color)
-        border-radius: 14px
-        padding: 14px
+    .ms-info
+      display: flex
+      align-items: center
+      gap: 10px
+      .ms-text
         display: flex
         flex-direction: column
-        &__logo
-            width: 100%
-            aspect-ratio: 16/9
-            border-radius: 10px
-            overflow: hidden
-            background: rgba(255,255,255,.06)
-            margin-bottom: 10px
-            img
-                width: 100%
-                height: 100%
-                object-fit: cover
-            .ph
-                width: 100%
-                height: 100%
-                background: rgba(255,255,255,.04)
-        &__title
-            margin: 0 0 6px
-            a
-                color: var(--white-color)
-                text-decoration: none
-                &:hover
-                    text-decoration: underline
-        &__desc
-            color: var(--sec-text-color)
-            margin: 6px 0 10px
-            min-height: 36px
-        &__actions
-            margin-top: auto
-            display: flex
-            gap: 8px
-
-    .cp-empty
-        color: var(--sec-text-color)
-
-    .cp-mobile-cta
-        position: fixed
-        left: 0
-        right: 0
-        bottom: 12px
-        padding: 0 12px
-        display: none
-        z-index: 100000
-        @media (max-width: 680px)
-            display: block
-        .btn-primary--full
-            width: 100%
-            padding: 14px
-            border-radius: 14px
-
-    .cp-link
-        color: var(--links-text-color)
-        text-decoration: none
-        &:hover
-            text-decoration: underline
+        span
+          font-size: 0.7rem
+          color: $primary
+          text-transform: uppercase
+          font-weight: 700
+        strong
+          font-size: 0.95rem
+          color: #fff
