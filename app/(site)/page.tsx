@@ -139,9 +139,9 @@ export default async function Home() {
             {popularCategories.length > 0 && (
                 <section className="home-section container">
                     <div className="section-head">
-                        <h2>Популярные разделы</h2>
+                        <h2>Catégories populaires</h2>
                         <a className="section-head__link" href="/categories">
-                            Все категории →
+                            Toutes les catégories →
                         </a>
                     </div>
 
