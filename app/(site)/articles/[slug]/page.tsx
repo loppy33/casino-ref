@@ -1,171 +1,173 @@
-// app/articles/[slug]/page.tsx
-import Bg from "@/components/Bg";
-import { prisma } from "@/lib/db";
+import { cache } from "react";
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Script from "next/script";
 import type { Metadata } from "next";
+import { prisma } from "@/lib/db";
+import Bg from "@/components/Bg";
 import { mdToPlain } from "@/utils/mdToPlain";
 
-type ParamsP = Promise<{ slug?: string | string[] } | undefined>;
-const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v ?? "");
+// ISR: Обновляем статью раз в час
+export const revalidate = 3600;
 
-function stripMd(md: string) {
-    return md
-        .replace(/`{1,3}[^`]*`{1,3}/g, "")
-        .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
-        .replace(/\[[^\]]*\]\([^)]+\)/g, "")
-        .replace(/[#>*_~\-`]+/g, "")
-        .replace(/\n+/g, " ")
-        .trim();
-}
+// Хелпер для расчета времени чтения
 function readingTime(text: string) {
     const words = text.split(/\s+/).filter(Boolean).length;
-    return Math.max(1, Math.round(words / 180)); // ~180 wpm
+    return Math.max(1, Math.round(words / 200));
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
-
-type Props = { params: { slug: string } };
-
-export async function generateMetadata({ params }: { params: { slug?: string } }): Promise<Metadata> {
-    const resolvedParams = await params;
-    const slug = resolvedParams?.slug;
-    const article = await prisma.article.findUnique({
-        where: { slug },
-        select: { title: true, bodyMd: true, published: true },
-    });
-
-    if (!article || !article.published) {
-        return {
-            title: `Article introuvable — ${siteName}`,
-            description: "Cet article est introuvable ou n'est pas publié.",
-        };
-    }
-
-    const plain = mdToPlain(article.bodyMd).replace(/\s+/g, " ").trim();
-    const description = plain.slice(0, 160);
-    // OG image: используем лого по умолчанию или endpoint генерации OG
-    const ogImage = `${siteUrl}/api/og/article/${slug}`;
-
-    return {
-        title: `${article.title} — ${siteName}`,
-        description,
-        openGraph: {
-            title: article.title,
-            description,
-            url: `${siteUrl}/articles/${slug}`,
-            siteName,
-            type: "article",
-            images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
-        },
-        alternates: { canonical: `${siteUrl}/articles/${slug}` },
-    };
-}
-
-export default async function ArticlePage({ params }: { params: ParamsP }) {
-    const p = (await params) ?? {};
-    const slug = first(p.slug);
-    if (!slug) notFound();
-
+// Кэшированный запрос к БД (Metadata + Page используют один и тот же результат)
+const getArticle = cache(async (slug: string) => {
     const article = await prisma.article.findUnique({
         where: { slug, published: true },
         include: { categories: true },
     });
+    return article;
+});
+
+// Кэшированный запрос для виджета казино (чтобы не грузить лишнее)
+const getTopCasino = cache(async () => {
+    return await prisma.casino.findFirst({
+        where: { rating: { not: null } },
+        orderBy: { rating: "desc" },
+        select: { name: true, logoUrl: true, rating: true, slug: true, links: { where: { isPrimary: true }, take: 1 } }
+    });
+});
+
+type ParamsP = Promise<{ slug: string }>;
+
+export async function generateMetadata(props: { params: ParamsP }): Promise<Metadata> {
+    const { slug } = await props.params;
+    const article = await getArticle(slug);
+
+    if (!article) return { title: "Article introuvable" };
+
+    const plainText = mdToPlain(article.bodyMd);
+    const description = plainText.slice(0, 160);
+    // Лучше использовать реальную картинку статьи, если она есть в БД (поле imageUrl)
+    const ogImage = `${process.env.NEXT_PUBLIC_SITE_URL}/logo.webp`; 
+
+    return {
+        title: article.title,
+        description,
+        openGraph: {
+            title: article.title,
+            description,
+            type: "article",
+            publishedTime: article.createdAt.toISOString(),
+            modifiedTime: article.updatedAt.toISOString(),
+            images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
+        },
+    };
+}
+
+export default async function ArticlePage(props: { params: ParamsP }) {
+    const { slug } = await props.params;
+    const [article, topCasino] = await Promise.all([
+        getArticle(slug),
+        getTopCasino()
+    ]);
+
     if (!article) notFound();
 
-    const plain = stripMd(article.bodyMd);
-    const readMin = readingTime(plain);
+    const plainText = mdToPlain(article.bodyMd);
+    const readMin = readingTime(plainText);
+    const dateStr = new Date(article.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
+    // Рендер Markdown (Серверный)
+    const MarkdownIt = (await import("markdown-it")).default;
+    const md = new MarkdownIt({ linkify: true, breaks: true, html: false }); // HTML false для безопасности
+    const htmlContent = md.render(article.bodyMd);
+
+    // Похожие статьи
     const related = await prisma.article.findMany({
         where: {
             id: { not: article.id },
             published: true,
-            ...(article.categories.length
-                ? { categories: { some: { id: { in: article.categories.map((c: any) => c.id) } } } }
-                : {}),
+            categories: { some: { id: { in: article.categories.map(c => c.id) } } }
         },
-        orderBy: { createdAt: "desc" },
-        take: 6,
+        take: 3,
+        orderBy: { createdAt: "desc" }
     });
 
-    let html = "";
-    try {
-        const MarkdownIt = (await import("markdown-it")).default;
-        const md = new MarkdownIt({ linkify: true, breaks: true, html: false });
-        const raw = md.render(article.bodyMd);
-        try {
-            const DOMPurify = (await import("isomorphic-dompurify")).default;
-            html = DOMPurify.sanitize(raw);
-        } catch {
-            html = raw;
-        }
-    } catch {
-        html = article.bodyMd.replace(/\n/g, "<br/>");
-    }
+    // Schema.org BlogPosting
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": article.title,
+        "datePublished": article.createdAt.toISOString(),
+        "dateModified": article.updatedAt.toISOString(),
+        "author": {
+            "@type": "Organization",
+            "name": process.env.NEXT_PUBLIC_SITE_NAME || "CasinoSearch"
+        },
+        "description": plainText.slice(0, 160)
+    };
+
+    const ctaLink = topCasino?.links?.[0] ? `/out/${topCasino.links[0].id}?source=article_sidebar` : "#";
 
     return (
-        <div className="Home">
+        <div className="ArticlePage">
             <Bg />
+            <Script id="article-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-            <section className="home-hero container">
-                <nav className="section-head2" aria-label="Fil d’Ariane" style={{ marginBottom: 8 }}>
-                    <a className="section-head__link" href="/articles">Articles</a>
-                    <span style={{ opacity: .6, margin: "0 6px" }}>/</span>
-                    <span>{article.title}</span>
-                </nav>
-
-                <h1 className="home-hero__title">{article.title}</h1>
-                <p className="home-hero__subtitle">
-                    {new Date(article.createdAt).toLocaleDateString("fr-FR")} · {readMin} min de lecture
-                </p>
-            </section>
-
-            <section className="home-section container" style={{ display: "grid", gap: 16, gridTemplateColumns: "minmax(0, 1fr)" }}>
-                {article.categories.length > 0 && (
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        {article.categories.map((cat: any) => (
-                            <a key={cat.id} href={`/categories/${cat.slug}`} className="cat-card" style={{ padding: "8px 10px" }}>
-                                <span className="cat-card__dot" />
-                                <span className="cat-card__name">{cat.name}</span>
-                            </a>
-                        ))}
+            {/* HEADER */}
+            <div className="ap-header">
+                <div className="container">
+                    <nav className="breadcrumbs">
+                        <a href="/">Accueil</a> / <a href="/articles">Articles</a> / <span>{article.title}</span>
+                    </nav>
+                    
+                    <div className="ap-meta">
+                        {article.categories[0] && <span className="cat-badge">{article.categories[0].name}</span>}
+                        <span className="date">{dateStr}</span>
+                        <span className="read-time">⏱ {readMin} min</span>
                     </div>
-                )}
 
-                <article
-                    className="article-card"
-                >
-                    <div
-                        className="prose"
-                        dangerouslySetInnerHTML={{ __html: html }}
-                    />
-                </article>
-            </section>
-
-            <section className="home-section container">
-                <div className="section-head">
-                    <h2>Articles similaires</h2>
-                    <a className="section-head__link" href="/articles">Voir tous →</a>
+                    <h1 className="ap-title">{article.title}</h1>
                 </div>
+            </div>
 
-                {related.length ? (
-                    <div className="article-grid article-page">
-                        {related.map((a: any) => (
-                            <article key={a.id} className="article-card">
-                                <h3 className="article-card__title">
-                                    <a href={`/articles/${a.slug}`}>{a.title}</a>
-                                </h3>
-                                <p className="article-card__excerpt">
-                                    {mdToPlain(a.bodyMd).slice(0, 120)}{stripMd(a.bodyMd).length > 160 ? "…" : ""}
-                                </p>
-                                <a className="article-card__more" href={`/articles/${a.slug}`}>Lire →</a>
-                            </article>
-                        ))}
+            <div className="container ap-layout">
+                {/* CONTENT COLUMN */}
+                <main className="ap-content">
+                    <article className="prose" dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                </main>
+
+                {/* SIDEBAR */}
+                <aside className="ap-sidebar">
+                    <div className="sticky-wrapper">
+                        {/* Виджет "Топ Казино" - повышает конверсию */}
+                        {topCasino && (
+                            <div className="sidebar-widget">
+                                <div className="sw-head">🏆 Top Casino</div>
+                                <div className="sw-body">
+                                    <div className="sw-logo">
+                                        <Image src={topCasino.logoUrl || "/placeholder.png"} alt={topCasino.name} fill style={{objectFit: "cover"}} />
+                                    </div>
+                                    <div className="sw-info">
+                                        <div className="sw-name">{topCasino.name}</div>
+                                        <div className="sw-rating">Note: {(topCasino.rating ? topCasino.rating / 20 : 0).toFixed(1)}/5</div>
+                                    </div>
+                                    <a href={ctaLink} className="sw-btn" target="_blank" rel="nofollow">JOUER</a>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Виджет "Похожие статьи" */}
+                        {related.length > 0 && (
+                            <div className="sidebar-list">
+                                <h3>À lire aussi</h3>
+                                {related.map(r => (
+                                    <a key={r.id} href={`/articles/${r.slug}`} className="sl-item">
+                                        {r.title}
+                                    </a>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                ) : (
-                    <p className="empty">Aucun article similaire pour l’instant.</p>
-                )}
-            </section>
+                </aside>
+            </div>
         </div>
     );
 }
