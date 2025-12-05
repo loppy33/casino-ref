@@ -32,6 +32,7 @@ function getMarkdownPreview(md: string, maxChars: number = 1500) {
     const mdParser = new MarkdownIt({ linkify: true, breaks: true, html: false });
     return mdParser.render(clean);
 }
+
 export default async function Home() {
     const [topCasinos, popularCategories, latestArticles] = await Promise.all([
         prisma.casino.findMany({
@@ -223,15 +224,6 @@ export default async function Home() {
                                         <a href={`/articles/${a.slug}`}>{a.title}</a>
                                     </h3>
 
-                                    {/* Используем <p> вместо вложенного <article>, 
-                                        но с классом, который (вероятно) унаследует цвет текста
-                                    */}
-                                    {/* <p 
-                                        className="article-card__excerpt" 
-                                        style={{ margin: "0 14px 14px", color: "var(--sec-text-color)" }}
-                                    >
-                                        {textPreview}
-                                    </p> */}
                                     <div className="prose" style={{ margin: "0 14px 14px", color: "var(--sec-text-color)" }} dangerouslySetInnerHTML={{ __html: textPreview }} />
 
                                     <a className="article-card__more" href={`/articles/${a.slug}`}>

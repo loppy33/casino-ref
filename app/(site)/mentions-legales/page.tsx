@@ -12,7 +12,7 @@ export default function MenLeg() {
                         <p className="lead">Informations légales et contact — site édité par un particulier</p>
                     </div>
                     <div className="MenLeg__cta">
-                        <a href={`mailto:${siteMail}`} className="btn">Contactez-nous</a>
+                        <a href={`mailto:${siteMail}`} className="btn btn--primary">Contactez-nous</a>
                         <a href="https://www.mvps.net/" target="_blank" rel="noopener noreferrer" className="btn btn--ghost">Hébergeur</a>
                     </div>
                 </div>
