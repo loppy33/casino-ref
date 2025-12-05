@@ -178,7 +178,10 @@ export default async function Home() {
                                             <a href={`/casinos/${c.slug}`}>{c.name}</a>
                                         </h3>
                                         <div className="casino-card__rating">
-                                            <Stars rating100={c.rating ?? 0} />
+                                            <Stars
+                                                value={c.rating}
+                                                id={c.id}
+                                            />
                                         </div>
                                     </div>
 

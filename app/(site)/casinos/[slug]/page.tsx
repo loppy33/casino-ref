@@ -140,7 +140,10 @@ export default async function CasinoPage(props: { params: ParamsP }) {
                                 Avis <span>{casino.name}</span>
                             </h1>
                             <div className="cp-hero__rating-row">
-                                <Stars rating100={casino.rating ?? 0} />
+                                <Stars
+                                    value={casino.rating ?? 0}
+                                    id={casino.id}
+                                />
                                 <span className="score">{(casino.rating ? casino.rating / 20 : 0).toFixed(1)}/5</span>
                             </div>
 
@@ -254,7 +257,10 @@ export default async function CasinoPage(props: { params: ParamsP }) {
                                 </div>
                                 <div className="sim-info">
                                     <div className="name">{s.name}</div>
-                                    <Stars rating100={s.rating ?? 0} />
+                                    <Stars
+                                        value={s.rating ?? 0}
+                                        id={s.id}
+                                    />
                                 </div>
                             </a>
                         ))}
