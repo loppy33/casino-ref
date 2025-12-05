@@ -151,7 +151,10 @@ export default async function Home() {
                                 <span className="cat-card__dot" />
                                 <span className="cat-card__name">{c.name}</span>
 
-                                <span className="cat-card__count">{c._count?.casinos ?? 0}</span>
+                                <span className="cat-card__count">
+                                    {c._count?.children ?? 0}
+                                </span>
+
                             </a>
                         ))}
                     </div>
