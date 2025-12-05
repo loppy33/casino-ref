@@ -1,15 +1,17 @@
-export const dynamic = "force-dynamic";
-
+import { Metadata } from "next";
+import Script from "next/script"; // Для JSON-LD
 import Bg from "@/components/Bg";
 import { prisma } from "@/lib/db";
 import { mdToPlain } from "@/utils/mdToPlain";
-import type { Metadata } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "";
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Casino Search";
+
+// ISR: Обновляем страницу раз в час (3600 сек).
+// Статьи меняются редко, поэтому force-dynamic здесь вреден для скорости.
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-    // Берём последний опубликованный article для более «свежего» OG-preview
     const latest = await prisma.article.findFirst({
         where: { published: true },
         orderBy: { createdAt: "desc" },
@@ -19,15 +21,18 @@ export async function generateMetadata(): Promise<Metadata> {
     const defaultDesc =
         "Découvrez nos articles sur les casinos en ligne : conseils, actualités, bonus, et stratégies pour jouer intelligemment et en toute sécurité.";
 
-    const description = latest ? mdToPlain(latest.bodyMd).slice(0, 160) : defaultDesc;
-    const ogImage = latest ? `${siteUrl}/api/og/article/${latest.slug}` : `${siteUrl}/logo.webp`;
-    // Пример: можно иметь route для генерации OG-изображений /api/og/article/[slug]
+    // Безопасная генерация описания
+    const description = latest 
+        ? mdToPlain(latest.bodyMd).slice(0, 160) 
+        : defaultDesc;
+        
+    const ogImage = `${siteUrl}/logo.webp`; // Если есть генерация картинок, верните: `${siteUrl}/api/og/article/${latest?.slug}`
 
     return {
-        title: "Articles sur les casinos en ligne — France",
+        title: "Articles & Guides Casino en Ligne — France",
         description,
         openGraph: {
-            title: "Articles sur les casinos en ligne — France",
+            title: "Articles & Guides Casino en Ligne — France",
             description,
             url: `${siteUrl}/articles`,
             siteName,
@@ -46,15 +51,48 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ArticlesPage() {
+    // Выбираем только нужные поля (select), чтобы не грузить тяжелые данные лишний раз
     const articles = await prisma.article.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
         take: 50,
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+            bodyMd: true,
+            createdAt: true, // Нужно для отображения даты
+        }
     });
+
+    // Генерируем Schema.org для списка статей (ItemList)
+    // Это помогает Google понять структуру блога
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "headline": "Articles et Guides Casino",
+        "description": "Conseils, actualités et stratégies pour les joueurs français.",
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": articles.map((article, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "url": `${siteUrl}/articles/${article.slug}`,
+                "name": article.title
+            }))
+        }
+    };
 
     return (
         <div className="Home">
             <Bg />
+            
+            {/* Вставка JSON-LD */}
+            <Script
+                id="articles-schema"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
 
             <section className="home-hero container">
                 <h1 className="home-hero__title">
@@ -69,25 +107,42 @@ export default async function ArticlesPage() {
             <section className="home-section container">
                 <div className="section-head">
                     <h2>Derniers articles</h2>
-                    <p className="home-hero__subtitle">Mises à jour régulières de nos experts</p>
+                    <p className="home-hero__subtitle" style={{ fontSize: '0.9rem', margin: 0 }}>
+                        Mises à jour régulières de nos experts
+                    </p>
                 </div>
 
                 {articles.length > 0 ? (
                     <div className="article-grid">
-                        {articles.map((a: any) => (
-                            <article key={a.id} className="article-card">
-                                <h3 className="article-card__title">
-                                    <a href={`/articles/${a.slug}`}>{a.title}</a>
-                                </h3>
-                                <p className="article-card__excerpt">
-                                    {mdToPlain(a.bodyMd).slice(0, 180)}
-                                    {a.bodyMd.length > 180 ? "…" : ""}
-                                </p>
-                                <a className="article-card__more" href={`/articles/${a.slug}`}>
-                                    Lire l’article →
-                                </a>
-                            </article>
-                        ))}
+                        {articles.map((a) => {
+                            // Форматируем дату (например: 5 déc. 2025)
+                            const dateStr = new Date(a.createdAt).toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                            });
+
+                            return (
+                                <article key={a.id} className="article-card">
+                                    <h3 className="article-card__title">
+                                        <a href={`/articles/${a.slug}`}>{a.title}</a>
+                                    
+                                    <div className="article-card__date">
+                                        {dateStr}
+                                    </div>
+                                    </h3>
+
+                                    <p className="article-card__excerpt">
+                                        {mdToPlain(a.bodyMd).slice(0, 160)}
+                                        {a.bodyMd.length > 160 ? "…" : ""}
+                                    </p>
+                                    
+                                    <a className="article-card__more" href={`/articles/${a.slug}`}>
+                                        Lire l’article →
+                                    </a>
+                                </article>
+                            );
+                        })}
                     </div>
                 ) : (
                     <p className="empty">Aucun article publié pour le moment.</p>
