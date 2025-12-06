@@ -8,6 +8,8 @@ npx next-sitemap
 # затем проверь files в public/: sitemap.xml, sitemap-0.xml и т.д.
 
 <!-- Обновление бд -->
+Это все делает, дальше ниже вроде не надо
+npx prisma db push
 
 Тесты, ручная проверка.
 npx prisma migrate dev --name add-user-nickname

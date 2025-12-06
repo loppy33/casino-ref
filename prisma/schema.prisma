@@ -115,3 +115,40 @@ model Click {
   casino Casino        @relation(fields: [casinoId], references: [id], onDelete: Cascade)
   link   AffiliateLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
+
+
+// Партнерская система
+model AffiliateUser {
+  id           String    @id @default(cuid())
+  username     String?
+  avatar       String    @default("0.png") // храним имя файла 0.png - 9.png
+  referralCode String    @unique
+  isAdmin      Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  
+  referrals    Referral[]
+}
+
+// Остальные модели (Referral, AffiliateClick) остаются как были в прошлом ответе
+
+
+model Referral {
+  id              String   @id @default(cuid())
+  referrerId      String
+  referredIp      String   // IP того, кого привели
+  referredCountry String?  // Страна (FR, etc)
+  createdAt       DateTime @default(now())
+  confirmed       Boolean  @default(false) // Становится true при клике на партнерку
+  
+  referrer        AffiliateUser @relation(fields: [referrerId], references: [id])
+}
+
+model AffiliateClick {
+  id             String   @id @default(cuid())
+  referralCode   String
+  ip             String
+  country        String?
+  userAgent      String?
+  isPartnerClick Boolean  @default(false) // true если клик по кнопке "Играть", false если просто заход
+  createdAt      DateTime @default(now())
+}
