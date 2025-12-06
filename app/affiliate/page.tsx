@@ -1,20 +1,7 @@
 'use client';
 
-import { Metadata } from 'next';
 import { useEffect, useState } from 'react';
-export const metadata: Metadata = {
-  title: "Restricted Access", // Нейтральный заголовок
-  robots: {
-    index: false,  // Запрещает индексацию
-    follow: false, // Запрещает переходить по ссылкам на этой странице
-    nocache: true, // Запрещает кэширование в сниппетах
-    googleBot: {
-      index: false,
-      follow: false,
-      noimageindex: true,
-    },
-  },
-};
+
 type UserData = {
     username: string;
     avatar: string;
