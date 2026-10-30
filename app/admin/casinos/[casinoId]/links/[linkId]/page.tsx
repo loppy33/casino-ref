@@ -22,12 +22,12 @@ export default async function EditLink({
     where: { id: linkId },
   });
 
-  if (!link) return <div className="container">Ссылка не найдена</div>;
+  if (!link) return <div className="container">Link not found</div>;
 
   return (
     <div className="FormPage container">
       <form action={updateLink} className="base__form">
-        <h2>Редактировать ссылку</h2>
+        <h2>Edit link</h2>
 
         <input type="hidden" name="id" defaultValue={link.id} />
         <input type="hidden" name="casinoId" defaultValue={casinoId} />
@@ -53,7 +53,7 @@ export default async function EditLink({
           Primary
         </label>
 
-        <button className="primary__btn">Сохранить</button>
+        <button className="primary__btn">Save</button>
       </form>
     </div>
   );

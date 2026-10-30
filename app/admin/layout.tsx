@@ -22,21 +22,21 @@ export default async function AdminLayout({
                 <div className="container">
                     <nav >
                         <a href="/admin">
-                            Дашборд
+                            Dashboard
                         </a>
                         <a href="/admin/categories">
-                            Категории
+                            Categories
                         </a>
                         <a href="/admin/casinos">
-                            Казино
+                            Casinos
                         </a>
                         <a href="/admin/articles">
-                            Статьи
+                            Articles
                         </a>
-                        <a href="/admin/clicks">Логи кликов</a>
+                        <a href="/admin/clicks">Click log</a>
                     </nav>
                     <a href="/api/auth/signout" >
-                        Выйти
+                        Sign out
                     </a>
                 </div>
             </header>
@@ -44,7 +44,7 @@ export default async function AdminLayout({
             <main>{children}</main>
             <footer className="admin-footer">
                 <AlertTriangle size={14} />
-                <span>Данные обновлены {new Date().toLocaleString("ru-RU")}</span>
+                <span>Data updated {new Date().toLocaleString("en-GB")}</span>
             </footer>
         </div>
     );

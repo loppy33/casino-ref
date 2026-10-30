@@ -6,10 +6,10 @@ export default async function CategoriesPage() {
     const cats = await prisma.category.findMany({ include: { parent: true }, orderBy: { name: "asc" } });
     return (
         <div className="AdminPage container">
-            <h1>Категории <a className="link__btn" href="/admin/categories/new">+ Добавить</a></h1>
+            <h1>Categories <a className="link__btn" href="/admin/categories/new">+ Add</a></h1>
             
             <table className="table">
-                <thead><tr><th>Название</th><th>slug</th><th>Родитель</th><th></th></tr></thead>
+                <thead><tr><th>Name</th><th>slug</th><th>Parent</th><th></th></tr></thead>
                 <tbody>
                     {cats.map((c: (typeof cats)[number]) => (
                         <tr key={c.id}>
@@ -18,7 +18,7 @@ export default async function CategoriesPage() {
                             <td>{c.parent?.name || "-"}</td>
                             <td className="ta-right">
                                 <form action={async () => { "use server"; await deleteCategory(c.id); }}>
-                                    <button className="danger__btn">Удалить</button>
+                                    <button className="danger__btn">Delete</button>
                                 </form>
                             </td>
                         </tr>

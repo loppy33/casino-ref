@@ -1,140 +1,165 @@
-Запуск призмы студии: npx prisma studio
- npx prisma db seed  - Для создания админа
+# Casino Search — affiliate casino review platform
 
-Перегенерируй sitemap и положи файлы в public/
-Если используешь next-sitemap:
-# в проекте
-npx next-sitemap
-# затем проверь files в public/: sitemap.xml, sitemap-0.xml и т.д.
+A full-stack, SEO-oriented platform for casino reviews, categories and articles, with an admin panel and an **affiliate click tracker** (`/out/:linkId` redirect with sub-ID templating and click logging).
 
-<!-- Обновление бд -->
+> All casinos, bonuses and affiliate URLs in the demo data are **fictional** (`example.com`).
 
-Тесты, ручная проверка.
-npx prisma migrate dev --name add-user-nickname
+![Home](docs/screenshots/home.png)
 
+## Features
 
-На сервере
-npx prisma generate
+- **Public site (French, SEO-first)** — home, casino list and review pages, nested categories, Markdown articles, FAQ, legal/responsible-gambling pages
+- **SEO** — ISR (`revalidate`), per-page metadata and Open Graph, Schema.org JSON-LD (`ItemList`, `Article`, `FAQPage`), `sitemap.xml`, `robots.txt`
+- **Affiliate tracking** — `/out/[id]` builds the partner URL from a template (`s1={clickId}&src={source}&gclid={gclid}`), stores the click (hashed IP + UA, `gclid`/`gbraid`, source) and issues a 302
+- **Admin panel** — dashboard with 24h/30d click stats and top casinos, CRUD for casinos, affiliate links, bonuses, categories (tree) and articles, paginated click log
+- **Auth** — NextAuth credentials provider (JWT), role-based access (`ADMIN`); every server action re-checks the role
+- **Safe Markdown** — rendered with `markdown-it` and sanitized with DOMPurify
+- **Bonus wheel** widget with a persistent countdown
 
-git push → на прод npx prisma migrate deploy.
+## Tech stack
 
+Next.js 16 (App Router, Server Actions) · React 19 · TypeScript · Prisma 6 · PostgreSQL · NextAuth v4 · Zod · Sass · Tailwind 4 · Framer Motion
 
-<!-- Обновления на сервере -->
-git pull
-npm run build
-pm2 restart all
+## Screenshots
 
+| Casinos | Casino review |
+|---|---|
+| ![](docs/screenshots/casinos.png) | ![](docs/screenshots/casino-detail.png) |
 
-<!-- Промпт для статей -->
-Génère une article complète en français sur le sujet suivant : **{TEMA}**  
-L’article doit être optimisé SEO pour apparaître en première page Google sur le marché français des casinos en ligne.
+| Categories | Article |
+|---|---|
+| ![](docs/screenshots/categories.png) | ![](docs/screenshots/article-detail.png) |
 
-FOURNIS STRICTEMENT :
-1) Un **titre court** et accrocheur
-2) Un **slug court et élégant**, uniquement en minuscules et avec des tirets
-3) Un **texte complet en Markdown**, structuré et prêt à être collé sur un site.  
-   - Le texte doit être unique, naturel, informatif et adapté au SEO (E-E-A-T)  
-   - Utilise H1/H2/H3  
-   - Ajoute une introduction claire et une conclusion forte  
-   - Ajoute un FAQ SEO  
-   - Utilise un ton professionnel, crédible, expert du marché iGaming  
-   - Insère des images sous la forme suivante :
+| Mobile | Admin dashboard |
+|---|---|
+| <img src="docs/screenshots/home-mobile.png" width="300"> | ![](docs/screenshots/admin-dashboard.png) |
 
-     ![alt-text](PROMPT POUR GENERER L’IMAGE – décrire la scène, style moderne, orientation paysage, très haute qualité)
+| Admin — casinos | Admin — click log |
+|---|---|
+| ![](docs/screenshots/admin-casinos.png) | ![](docs/screenshots/admin-clicks.png) |
 
-   - Toutes les images doivent être pertinentes pour le contenu  
-   - Le texte doit être suffisamment long pour être bien référencé
+More: [login](docs/screenshots/login.png) · [articles](docs/screenshots/articles.png) · [FAQ](docs/screenshots/faq.png) · [admin articles](docs/screenshots/admin-articles.png)
 
-OBJECTIF :
-Créer un article qui attire du trafic organique sur les recherches liées aux casinos en ligne, aux bonus, aux jeux, aux comparatifs, et à la sécurité.
+## Architecture
 
-RENVOIE LE MARKDOWN SOUS FORME DE BLOC DE CODE.
+```mermaid
+flowchart LR
+    V[Visitor] -->|SSR / ISR| S[Next.js App Router<br/>public pages]
+    V -->|click "Play now"| O["/out/:linkId<br/>route handler"]
+    O -->|log click| DB[(PostgreSQL)]
+    O -->|302 + sub-IDs| P[Affiliate partner]
+    S -->|Prisma| DB
+    A[Admin] -->|NextAuth JWT| AD[Admin pages<br/>+ Server Actions]
+    AD -->|requireAdmin + Zod| DB
+```
 
+### Data model
 
-<!-- еще один промпт минимум 1500 до 2000 слов-->
+```mermaid
+erDiagram
+    User { string id PK
+           string email UK
+           string password
+           Role role }
+    Category ||--o{ Category : "parent / children"
+    Category }o--o{ Casino : "CasinoCategories"
+    Category }o--o{ Article : "ArticleCategories"
+    Casino ||--o{ AffiliateLink : has
+    Casino ||--o{ Bonus : has
+    Casino ||--o{ Click : receives
+    AffiliateLink ||--o{ Click : tracks
+    Casino { string slug UK
+             int rating
+             string license
+             int minDeposit
+             string[] pros
+             string[] cons }
+    AffiliateLink { string network
+                    string baseUrl
+                    string subTemplate
+                    bool isPrimary }
+    Click { string id PK
+            string source
+            string gclid
+            string ipHash }
+    Article { string slug UK
+              string bodyMd
+              bool published }
+```
 
-Tu es un expert SEO spécialisé dans l’iGaming, les casinos en ligne et le marché français.
+### Click tracking flow
 
-Génère un article ULTRA COMPLET en français sur le sujet suivant : **{TEMA}**
+```mermaid
+sequenceDiagram
+    participant U as Visitor
+    participant N as /out/[id]
+    participant D as PostgreSQL
+    participant P as Partner
+    U->>N: GET /out/{linkId}?source=seo&gclid=...
+    N->>D: find AffiliateLink + Casino
+    N->>N: clickId = uuid, build URL from subTemplate
+    N->>D: INSERT Click (ipHash, UA, gclid, source)
+    N-->>U: 302 Location: partner URL with s1={clickId}
+    U->>P: follows redirect
+```
 
-EXIGENCES GÉNÉRALES :
-- L’article doit obligatoirement contenir **1 500 à 2 000 mots minimum** (ou plus si nécessaire).
-- Le texte doit être unique, expert, naturel, informatif et optimisé E-E-A-T.
-- Style : professionnel, crédible, clair, adapté au public français.
-- Le contenu doit cibler les mots-clés à forte et moyenne concurrence du secteur casino.
-- Intègre naturellement des variantes de mots-clés pour maximiser le SEO.
-- L’article doit impérativement intégrer **des liens internes vers les pages pertinentes du site CasinoSearch.fr**. 
-  Les liens doivent être insérés naturellement dans le texte lorsque cela est logique.
+## Getting started
 
-PAGES DISPONIBLES POUR LES LIENS INTERNES (à utiliser si pertinent) :
-- Accueil : https://casinosearch.fr
-- Liste des casinos : https://casinosearch.fr/casinos
-- Catégories : https://casinosearch.fr/categories
-- Articles : https://casinosearch.fr/articles
-- FAQ : https://casinosearch.fr/faq
-- Jeu Responsable : https://casinosearch.fr/responsable-jeu
-- Mentions légales : https://casinosearch.fr/mentions-legales
-- Politique de confidentialité : https://casinosearch.fr/politique-confidentialite
+Requirements: Node.js 20+, Docker (or any PostgreSQL 14+).
 
-IMPORTANT :
-- L’IA doit **choisir les liens pertinents en fonction du sujet**, mais n’en ajouter que si cela apporte de la valeur.
-- Ne pas spammer : 3 à 6 liens internes maximum par article, parfaitement intégrés.
+```bash
+git clone <repo-url> && cd casino-ref
+npm install
 
-FOURNIS STRICTEMENT :
-1) **Un titre court et accrocheur**
-2) **Un slug court, propre et optimisé SEO** (ex. “meilleurs-casinos-france-2025”)
-3) **Un article complet en Markdown**, retourné *dans un seul bloc de code*
+cp env.example .env           # adjust values if needed
+docker compose up -d          # PostgreSQL on :5432
 
-STRUCTURE OBLIGATOIRE DU MARKDOWN :
+npx prisma migrate deploy     # create tables
+npx prisma db seed            # admin user + demo casinos, articles, clicks
 
-# Titre H1 principal
+npm run dev                   # http://localhost:3000
+```
 
-![illustration principale](PROMPT POUR GENERER L’IMAGE – scène moderne, casino en ligne, style réaliste, lumière douce, haute qualité, horizontal)
+Admin panel: <http://localhost:3000/login> — credentials come from `NEXT_ADMIN_EMAIL` / `NEXT_ADMIN_PASSWORD` in `.env` (defaults: `admin@example.com` / `AdminPass404`). **Change them for any real deployment.**
 
-## Introduction
-Un paragraphe naturel, clair, contenant les mots-clés principaux et éventuellement un lien interne pertinent.
+### Environment variables
 
-## Section 1 — Présentation du sujet
-Texte expert, détaillé, informatif.
-![image](PROMPT POUR GENERER L’IMAGE – illustration liée à la section)
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET` | NextAuth base URL and a long random secret |
+| `NEXT_ADMIN_EMAIL`, `NEXT_ADMIN_PASSWORD` | Admin account created by the seed |
+| `NEXT_PUBLIC_SITE_NAME`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SITE_MAIL` | Site metadata |
+| `NEXT_PUBLIC_GA_ID` | Optional Google Analytics ID |
 
-### Sous-section si nécessaire
-Analyse ou explications supplémentaires.
+### Scripts
 
-## Section 2 — Analyse approfondie / Comparatif / Fonctionnement
-Texte long et complet.
-![image](PROMPT POUR GENERER L’IMAGE – illustration descriptive, moderne)
-Inclure ici un lien interne pertinent vers par ex. /casinos ou /categories si cela fait sens.
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build && npm start` | Production build and server |
+| `npx prisma studio` | Browse the database |
+| `npx prisma db seed` | (Re)load demo data — idempotent |
 
-## Section 3 — Conseils d’expert
-Liste + explications, ton professionnel.
-![image](PROMPT POUR GENERER L’IMAGE – concept visuel de conseils, design premium)
-Inclure un lien interne s’il renforce l’information (ex. /responsable-jeu).
+## Project structure
 
-## Section 4 — Erreurs à éviter
-Contenu long, pédagogique.
+```
+app/
+  (site)/        public pages (home, casinos, categories, articles, faq, legal)
+  admin/         dashboard + CRUD, server actions guarded by requireAdmin()
+  api/           NextAuth + bonuses endpoint
+  out/[id]/      affiliate redirect + click logging
+lib/             prisma client, auth helpers
+prisma/          schema, migrations, seed
+docs/screenshots
+```
 
-## Section 5 — Points importants pour les joueurs français
-Parler réglementation, sécurité, protection des données, etc.
-Possibilité d’intégrer un lien interne vers :  
-- /responsable-jeu  
-- /politique-confidentialite  
-- /faq  
+## Deployment notes
 
-## FAQ SEO (au moins 6 questions)
-Chaque réponse doit faire 3–5 lignes minimum.
-Les questions doivent couvrir les recherches fréquentes autour du sujet.
+```bash
+git pull && npm ci && npx prisma migrate deploy && npm run build && pm2 restart all
+```
 
-## Conclusion
-Résumé fort, ton expert, CTA discret et informatif (sans incitation au jeu).
-Possibilité d’intégrer un dernier lien interne pertinent.
+## Disclaimer
 
-RESTRICTIONS :
-- Aucune incitation à jouer ou parier.
-- Ne mentionne aucune marque interdite.
-- Le ton doit rester informatif, crédible et neutre.
-- Toutes les images doivent être sous forme :
-  ![alt](PROMPT POUR GENERER L’IMAGE)
-
-OBJECTIF FINAL :
-Créer la meilleure page disponible sur internet sur ce sujet afin d’atteindre le TOP 3 Google en France en 2025.
+Portfolio project. Gambling involves risk; the demo content is fictional and not an offer to gamble.

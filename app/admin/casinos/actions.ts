@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -25,10 +26,10 @@ const toSlug = (v: unknown) => {
 const casinoSchema = z.object({
   id: z.string().optional(),
 
-  name: z.string().trim().min(2, "Название слишком короткое"),
+  name: z.string().trim().min(2, "Name is too short"),
   slug: z.preprocess(
     toSlug,
-    z.string().min(2).regex(/^[a-z0-9-]+$/, "slug: только a-z, 0-9, -")
+    z.string().min(2).regex(/^[a-z0-9-]+$/, "slug: only a-z, 0-9, -")
   ),
 
   rating: z.preprocess(emptyToUndef, z.coerce.number().int().min(0).max(100).optional()),
@@ -51,6 +52,7 @@ const casinoSchema = z.object({
 });
 
 export async function createCasino(formData: FormData) {
+  await requireAdmin();
   const parsed = casinoSchema.parse({
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -85,6 +87,7 @@ export async function createCasino(formData: FormData) {
 }
 
 export async function updateCasino(formData: FormData) {
+  await requireAdmin();
   const parsed = casinoSchema.parse({
     id: formData.get("id"),
     name: formData.get("name"),
@@ -125,6 +128,7 @@ export async function updateCasino(formData: FormData) {
 }
 
 export async function deleteCasino(id: string) {
+  await requireAdmin();
   await prisma.casino.delete({ where: { id } });
   revalidatePath("/admin/casinos");
 }
@@ -141,6 +145,7 @@ const linkSchema = z2.object({
 });
 
 export async function createLink(formData: FormData) {
+  await requireAdmin();
   const parsed = linkSchema.parse({
     casinoId: formData.get("casinoId"),
     network: formData.get("network"),
@@ -163,6 +168,7 @@ export async function createLink(formData: FormData) {
 }
 
 export async function updateLink(formData: FormData) {
+  await requireAdmin();
   const parsed = linkSchema.parse({
     id: formData.get("id"),
     casinoId: formData.get("casinoId"),
@@ -186,6 +192,7 @@ export async function updateLink(formData: FormData) {
 }
 
 export async function deleteLink(id: string, casinoId: string) {
+  await requireAdmin();
   await prisma.affiliateLink.delete({ where: { id } });
   revalidatePath(`/admin/casinos/${casinoId}`);
 }
@@ -198,12 +205,13 @@ const emptyToNull = (v: unknown) =>
 const bonusSchema = z2.object({
   id: z2.string().optional(),
   casinoId: z2.string(),
-  name: z2.string().trim().min(1, "Название обязательно"),
+  name: z2.string().trim().min(1, "Name is required"),
   bonusUrl: z2.preprocess(emptyToNull, z2.string().nullable().optional()),
   promocode: z2.preprocess(emptyToNull, z2.string().nullable().optional()),
 });
 
 export async function createBonus(formData: FormData) {
+  await requireAdmin();
   const parsed = bonusSchema.safeParse({
     casinoId: String(formData.get("casinoId") || ""),
     name: formData.get("name"),
@@ -232,6 +240,7 @@ export async function createBonus(formData: FormData) {
 }
 
 export async function updateBonus(formData: FormData) {
+  await requireAdmin();
   const parsed = bonusSchema.safeParse({
     id: formData.get("id"),
     casinoId: String(formData.get("casinoId") || ""),
@@ -263,6 +272,7 @@ export async function updateBonus(formData: FormData) {
 }
 
 export async function deleteBonus(bonusId: string, casinoId?: string) {
+  await requireAdmin();
   await prisma.bonus.delete({ where: { id: bonusId } });
 
   if (casinoId) revalidatePath(`/admin/casinos/${casinoId}`);

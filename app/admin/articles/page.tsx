@@ -9,9 +9,9 @@ export default async function ArticlesPage() {
     });
     return (
         <div className="AdminPage container">
-            <h1>Статьи <a href="/admin/articles/new" className="link__btn">+ Добавить</a></h1>
+            <h1>Articles <a href="/admin/articles/new" className="link__btn">+ Add</a></h1>
             <table className="table">
-                <thead><tr><th>Заголовок</th><th>slug</th><th>Категории</th><th>Публ.</th><th></th></tr></thead>
+                <thead><tr><th>Title</th><th>slug</th><th>Categories</th><th>Published</th><th></th></tr></thead>
                 <tbody>
                     {arts.map((a: (typeof arts)[number]) => (
                         <tr key={a.id}>
@@ -30,7 +30,7 @@ export default async function ArticlesPage() {
                                         await deleteArticle(a.id);
                                     }}
                                 >
-                                    <button className="danger__btn">Удалить</button>
+                                    <button className="danger__btn">Delete</button>
                                 </form>
                             </td>
                         </tr>

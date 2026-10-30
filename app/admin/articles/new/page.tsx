@@ -32,18 +32,18 @@ export default async function NewArticle({
   return (
     <div className="FormPage container">
       <form action={createArticle} className="base__form">
-        <h2>Новая статья</h2>
+        <h2>New article</h2>
 
         {errorMsg && <div className="error__box">{errorMsg}</div>}
 
-        <input name="title" placeholder="Заголовок" required />
+        <input name="title" placeholder="Title" required />
         <input name="slug" placeholder="slug (a-z0-9-)" required />
         <label className="checkbox">
-          <input type="checkbox" name="published" /> Опубликована
+          <input type="checkbox" name="published" /> Published
         </label>
 
         <fieldset>
-          <legend>Категории</legend>
+          <legend>Categories</legend>
           <div className="checkbox-list">
             {categories.map((c: any) => (
               <label key={c.id} className="checkbox">
@@ -56,11 +56,11 @@ export default async function NewArticle({
         <textarea
           name="bodyMd"
           rows={14}
-          placeholder="Markdown-текст (минимум 10 символов)"
+          placeholder="Markdown text (at least 10 characters)"
           required
         />
 
-        <button className="primary__btn">Сохранить</button>
+        <button className="primary__btn">Save</button>
       </form>
     </div>
   );

@@ -45,7 +45,7 @@ async function getStats() {
                 include: { casino: { select: { name: true } } }
             }),
 
-            // Черновики
+            // Drafts
             prisma.article.count({ where: { published: false } }),
 
             // Ошибки: казино без ссылок
@@ -65,13 +65,13 @@ async function getStats() {
 export default async function AdminPage() {
     const s = await getStats();
 
-    if (!s) return <div className="AdminPage">Ошибка загрузки</div>;
+    if (!s) return <div className="AdminPage">Failed to load</div>;
 
     return (
         <div className="AdminPage container">
             <h1>
-                Главная панель
-                <span>Обновлено: {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
+                Dashboard
+                <span>Updated: {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
             </h1>
 
             {/* --- БЛОК 1: Карточки --- */}
@@ -79,7 +79,7 @@ export default async function AdminPage() {
 
                 <div className="card">
                     <div className="card-header">
-                        <span>Клики (24ч)</span>
+                        <span>Clicks (24h)</span>
                         <MousePointerClick size={18} />
                     </div>
                     <div className="stat-value">{s.clicks24h.toLocaleString()}</div>
@@ -87,7 +87,7 @@ export default async function AdminPage() {
 
                 <div className="card">
                     <div className="card-header">
-                        <span>Клики (30д)</span>
+                        <span>Clicks (30d)</span>
                         <TrendingUp size={18} />
                     </div>
                     <div className="stat-value">{s.clicks30d.toLocaleString()}</div>
@@ -95,14 +95,14 @@ export default async function AdminPage() {
 
                 <div className="card">
                     <div className="card-header">
-                        <span>Казино</span>
+                        <span>Casinos</span>
                         <Database size={18} />
                     </div>
                     <div className="stat-value">
                         {s.casinosCount}
                         {/* Алерт, если есть казино без ссылок */}
                         {s.casinosWithoutLinks > 0 && (
-                            <span className="badge error" title="Казино без партнерских ссылок">
+                            <span className="badge error" title="Casinos without affiliate links">
                                 <AlertTriangle size={12} /> {s.casinosWithoutLinks}
                             </span>
                         )}
@@ -111,14 +111,14 @@ export default async function AdminPage() {
 
                 <div className="card">
                     <div className="card-header">
-                        <span>Статьи</span>
+                        <span>Articles</span>
                         <FileText size={18} />
                     </div>
                     <div className="stat-value">
                         {s.articlesCount}
                         {s.draftArticles > 0 && (
-                            <span className="badge info" title="Черновики">
-                                {s.draftArticles} черн.
+                            <span className="badge info" title="Drafts">
+                                {s.draftArticles} drafts
                             </span>
                         )}
                     </div>
@@ -129,14 +129,14 @@ export default async function AdminPage() {
             {/* --- БЛОК 2: Детальная статистика --- */}
             <div className="dashboard-grid">
 
-                {/* Панель: Топ Казино */}
+                {/* Панель: Топ Casinos */}
                 <div className="panel">
-                    <h3><TrendingUp size={18} /> Топ казино (30 дн.)</h3>
+                    <h3><TrendingUp size={18} /> Top casinos (30 days)</h3>
                     <table>
                         <thead>
                             <tr>
-                                <th>Название</th>
-                                <th className="text-right">Клики</th>
+                                <th>Name</th>
+                                <th className="text-right">Clicks</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,7 +147,7 @@ export default async function AdminPage() {
                                 </tr>
                             ))}
                             {s.topCasinos.length === 0 && (
-                                <tr><td colSpan={2}>Нет данных</td></tr>
+                                <tr><td colSpan={2}>No data</td></tr>
                             )}
                         </tbody>
                     </table>
@@ -155,14 +155,14 @@ export default async function AdminPage() {
 
                 {/* Панель: Лог последних кликов */}
                 <div className="panel">
-                    <h3><Clock size={18} /> Последние переходы</h3>
+                    <h3><Clock size={18} /> Recent clicks</h3>
                     <div className="log-list">
                         {s.recentClicks.map((click: any) => (
                             <div key={click.id} className="log-item">
                                 <div className="log-info">
                                     <strong>{click.casino.name}</strong>
                                     <div className="meta">
-                                        <span>{new Date(click.createdAt).toLocaleString('ru-RU')}</span>
+                                        <span>{new Date(click.createdAt).toLocaleString('en-GB')}</span>
                                         {click.source && <span className="tag">{click.source}</span>}
                                         {click.gclid && <span className="tag tag-green">Ads</span>}
                                     </div>
@@ -170,7 +170,7 @@ export default async function AdminPage() {
                                 <LinkIcon size={14} style={{ opacity: 0.3 }} />
                             </div>
                         ))}
-                        {s.recentClicks.length === 0 && <p style={{ opacity: 0.5 }}>Кликов пока нет</p>}
+                        {s.recentClicks.length === 0 && <p style={{ opacity: 0.5 }}>No clicks yet</p>}
                     </div>
                 </div>
 

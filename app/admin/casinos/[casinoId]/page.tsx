@@ -13,7 +13,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
         prisma.category.findMany({ orderBy: { name: "asc" } }),
     ]);
 
-    if (!casino) return <div className="container">Не найдено</div>;
+    if (!casino) return <div className="container">Not found</div>;
 
     const selected = new Set(
         casino.categories.map((c: (typeof casino.categories)[number]) => c.id)
@@ -22,7 +22,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
     return (
         <div className="FormPage container">
             <form action={updateCasino} className="base__form">
-                <h2>Редактировать казино</h2>
+                <h2>Edit casino</h2>
                 <input type="hidden" name="id" defaultValue={casino.id} />
                 <input name="name" defaultValue={casino.name} required />
                 <input name="slug" defaultValue={casino.slug} required />
@@ -31,23 +31,23 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                 <input name="rating" type="number" min={0} max={100} defaultValue={casino.rating ?? ""} />
                 <input name="minDeposit" type="number" min={0} defaultValue={casino.minDeposit ?? ""} />
                 <label className="checkbox">
-                    <input type="checkbox" name="is18plus" defaultChecked={casino.is18plus} /> Только 18+
+                    <input type="checkbox" name="is18plus" defaultChecked={casino.is18plus} /> 18+ only
                 </label>
                 <textarea name="shortDesc" defaultValue={casino.shortDesc || ""} />
 
                 <div className="grid-2">
                     <div>
-                        <label>Плюсы</label>
+                        <label>Pros</label>
                         <textarea name="pros" rows={6} defaultValue={(casino.pros || []).join("\n")} />
                     </div>
                     <div>
-                        <label>Минусы</label>
+                        <label>Cons</label>
                         <textarea name="cons" rows={6} defaultValue={(casino.cons || []).join("\n")} />
                     </div>
                 </div>
 
                 <fieldset>
-                    <legend>Категории</legend>
+                    <legend>Categories</legend>
                     <div className="checkbox-list">
                         {categories.map((cat: (typeof categories)[number]) => (
                             <label key={cat.id} className="checkbox">
@@ -63,15 +63,15 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                     </div>
                 </fieldset>
 
-                <button className="primary__btn">Сохранить</button>
+                <button className="primary__btn">Save</button>
             </form>
 
             <section className="mt-4">
-                <h3>Партнёрские ссылки <a className="link__btn" href={`/admin/casinos/${casino.id}/links/new`}>+ Добавить ссылку</a></h3>
+                <h3>Affiliate links <a className="link__btn" href={`/admin/casinos/${casino.id}/links/new`}>+ Add link</a></h3>
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>Сеть</th>
+                            <th>Network</th>
                             <th>URL</th>
                             <th>subTemplate</th>
                             <th>primary</th>
@@ -94,7 +94,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                                             await deleteLink(l.id, casino.id);
                                         }}
                                     >
-                                        <button className="danger__btn">Удалить</button>
+                                        <button className="danger__btn">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -103,13 +103,13 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                 </table>
             </section>
             <section className="mt-4">
-                <h3>Бонусы <a className="link__btn" href={`/admin/casinos/${casino.id}/bonuses/new`}>+ Добавить бонус</a></h3>
+                <h3>Bonuses <a className="link__btn" href={`/admin/casinos/${casino.id}/bonuses/new`}>+ Add bonus</a></h3>
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>Название</th>
+                            <th>Name</th>
                             <th>URL</th>
-                            <th>Промокод</th>
+                            <th>Promo code</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -128,7 +128,7 @@ export default async function EditCasino({ params }: { params: { casinoId: strin
                                             await deleteBonus(b.id, casino.id);
                                         }}
                                     >
-                                        <button className="danger__btn">Удалить</button>
+                                        <button className="danger__btn">Delete</button>
                                     </form>
                                 </td>
                             </tr>

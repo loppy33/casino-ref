@@ -10,17 +10,17 @@ export default async function CasinosPage() {
 
     return (
         <div className="AdminPage container">
-            <h1>Казино <a href="/admin/casinos/new" className="link__btn">+ Добавить</a></h1>
+            <h1>Casinos <a href="/admin/casinos/new" className="link__btn">+ Add</a></h1>
             
 
             <table className="table">
                 <thead>
                     <tr>
-                        <th>Название</th>
-                        <th>Лицензия</th>
-                        <th>Рейтинг</th>
-                        <th>Категории</th>
-                        <th>Ссылки</th>
+                        <th>Name</th>
+                        <th>License</th>
+                        <th>Rating</th>
+                        <th>Categories</th>
+                        <th>Links</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -42,7 +42,7 @@ export default async function CasinosPage() {
                                     }}
                                     style={{ display: "inline-block", marginLeft: 8 }}
                                 >
-                                    <button className="danger__btn">Удалить</button>
+                                    <button className="danger__btn">Delete</button>
                                 </form>
                             </td>
                         </tr>

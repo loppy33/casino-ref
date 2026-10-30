@@ -20,26 +20,26 @@ export default async function EditBonus({
     const bonus = await prisma.bonus.findUnique({
         where: { id: bonusId }
     });
-    if (!bonus) return <div className="container">Бонус не найден</div>;
+    if (!bonus) return <div className="container">Bonus not found</div>;
 
     return (
         <div className="FormPage container">
             <form action={updateBonus} className="base__form">
-                <h2>Редактировать бонус</h2>
+                <h2>Edit bonus</h2>
                 <input type="hidden" name="id" defaultValue={bonus.id} />
                 <input type="hidden" name="casinoId" defaultValue={casinoId} />
 
-                <label>Название</label>
+                <label>Name</label>
                 <input name="name" defaultValue={bonus.name} required />
 
                 <label>URL</label>
                 <input name="bonusUrl" defaultValue={bonus.bonusUrl || ""} />
 
-                <label>Промокод</label>
+                <label>Promo code</label>
                 <input name="promocode" defaultValue={bonus.promocode || ""} />
 
                 <div className="form-actions">
-                    <button className="primary__btn">Сохранить</button>
+                    <button className="primary__btn">Save</button>
                 </div>
             </form>
 
@@ -50,7 +50,7 @@ export default async function EditBonus({
                 }}
                 className="mt-4"
             >
-                <button className="danger__btn">Удалить бонус</button>
+                <button className="danger__btn">Delete bonus</button>
             </form>
         </div>
     );

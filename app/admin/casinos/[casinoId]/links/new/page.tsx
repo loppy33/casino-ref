@@ -13,11 +13,11 @@ export default async function NewLink({ params, }: { params: ParamsP; }) {
     return (
         <div className="FormPage container">
             <form action={createLink} className="base__form">
-                <h2>Новая партнёрская ссылка</h2>
+                <h2>New affiliate link</h2>
 
                 <input type="hidden" name="casinoId" defaultValue={casinoId} />
 
-                <input name="network" placeholder="Сеть (например, Affise)" required />
+                <input name="network" placeholder="Network (e.g. Affise)" required />
                 <input
                     name="baseUrl"
                     type="url"
@@ -29,7 +29,7 @@ export default async function NewLink({ params, }: { params: ParamsP; }) {
                     <input type="checkbox" name="isPrimary" defaultChecked /> Primary
                 </label>
 
-                <button className="primary__btn">Сохранить</button>
+                <button className="primary__btn">Save</button>
             </form>
         </div>
     );

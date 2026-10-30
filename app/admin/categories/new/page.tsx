@@ -7,16 +7,16 @@ export default async function NewCategory() {
     return (
         <div className="FormPage container">
             <form action={createCategory} className="base__form">
-                <h2>Новая категория</h2>
-                <input name="name" placeholder="Название" required />
+                <h2>New category</h2>
+                <input name="name" placeholder="Name" required />
                 <input name="slug" placeholder="slug" required />
                 <select className="input" name="parentId" defaultValue="">
-                    <option value="">(без родителя)</option>
+                    <option value="">(no parent)</option>
                     {parents.map((p: (typeof parents)[number]) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                 </select>
-                <button className="primary__btn">Сохранить</button>
+                <button className="primary__btn">Save</button>
             </form>
         </div>
     );

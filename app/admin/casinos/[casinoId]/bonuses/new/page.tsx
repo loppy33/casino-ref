@@ -12,19 +12,19 @@ export default async function NewBonus({ params, }: { params: ParamsP; }) {
     return (
         <div className="FormPage container">
             <form action={createBonus} className="base__form">
-                <h2>Добавить бонус</h2>
+                <h2>Add bonus</h2>
                 <input type="hidden" name="casinoId" defaultValue={casinoId} />
                 
-                <label>Название</label>
+                <label>Name</label>
                 <input name="name" required placeholder="200% Bonus up to €1,000 + 100 Free Spins on Starburst"/>
 
-                <label>URL (опционально)</label>
+                <label>URL (optional)</label>
                 <input name="bonusUrl" placeholder="https://example.com/offerPromocode"/>
 
-                <label>Промокод (опционально)</label>
+                <label>Promo code (optional)</label>
                 <input name="promocode" placeholder="CASINOSEARCH"/>
 
-                <button className="primary__btn">Создать</button>
+                <button className="primary__btn">Create</button>
             </form>
         </div>
     );

@@ -37,16 +37,16 @@ export default async function ClicksPage({
 
     return (
         <div className="AdminPage container">
-            <h1>Клики</h1>
-            <p>Всего: {total}</p>
+            <h1>Clicks</h1>
+            <p>Total: {total}</p>
 
             <table className="table">
                 <thead>
                     <tr>
-                        <th>Когда</th>
-                        <th>Казино</th>
-                        <th>Сеть</th>
-                        <th>Источник</th>
+                        <th>When</th>
+                        <th>Casinos</th>
+                        <th>Network</th>
+                        <th>Source</th>
                         <th>gclid</th>
                         <th>UA</th>
                     </tr>
@@ -55,7 +55,7 @@ export default async function ClicksPage({
                     {items.map((i: any) => (
                         <tr key={i.id}>
                             <td>
-                                {new Date(i.createdAt).toLocaleString("ru-RU", {
+                                {new Date(i.createdAt).toLocaleString("en-GB", {
                                     hour12: false,
                                 })}
                             </td>

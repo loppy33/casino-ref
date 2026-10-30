@@ -41,7 +41,7 @@ export async function GET(
     { params }: { params: Promise<{ id?: string }> }
 ) {
     const { id } = await params; // linkId
-    if (!id) return NextResponse.redirect("/", 302);
+    if (!id) return NextResponse.redirect(new URL("/", _req.url), 302);
 
     const h = await headers();
     // вытаскиваем возможные метки из исходного запроса
@@ -57,7 +57,7 @@ export async function GET(
         where: { id },
         include: { casino: true },
     });
-    if (!link) return NextResponse.redirect("/", 302);
+    if (!link) return NextResponse.redirect(new URL("/", _req.url), 302);
 
     // генерим clickId
     const clickId = crypto.randomUUID();

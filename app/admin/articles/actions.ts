@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -15,17 +16,18 @@ const toSlug = (v: unknown) => {
 
 const articleSchema = z.object({
   id: z.string().optional(),
-  title: z.string().trim().min(3, "Заголовок слишком короткий"),
+  title: z.string().trim().min(3, "Title is too short"),
   slug: z.preprocess(
     toSlug,
-    z.string().min(2, "slug слишком короткий").regex(/^[a-z0-9-]+$/, "slug: только a-z, 0-9, -")
+    z.string().min(2, "Slug is too short").regex(/^[a-z0-9-]+$/, "slug: only a-z, 0-9, -")
   ),
-  bodyMd: z.string().trim().min(10, "Текст статьи должен быть ≥ 10 символов"),
+  bodyMd: z.string().trim().min(10, "Article body must be at least 10 characters"),
   published: z.preprocess((v) => (v === undefined ? false : v), z.coerce.boolean()),
   categoryIds: z.array(z.string()).optional().default([]),
 });
 
 export async function createArticle(fd: FormData) {
+  await requireAdmin();
   const parsed = articleSchema.safeParse({
     title: fd.get("title"),
     slug: fd.get("slug"),
@@ -58,6 +60,7 @@ export async function createArticle(fd: FormData) {
 }
 
 export async function updateArticle(fd: FormData) {
+  await requireAdmin();
   const parsed = articleSchema.safeParse({
     id: fd.get("id"),
     title: fd.get("title"),
@@ -94,6 +97,7 @@ export async function updateArticle(fd: FormData) {
 }
 
 export async function deleteArticle(id: string) {
+  await requireAdmin();
   await prisma.article.delete({ where: { id } });
   revalidatePath("/admin/articles");
 }

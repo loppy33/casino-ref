@@ -36,18 +36,18 @@ export default async function EditArticle({
     return (
         <div className="FormPage container">
             <form action={updateArticle} className="base__form">
-                <h2>Редактировать статью</h2>
+                <h2>Edit article</h2>
 
                 <input type="hidden" name="id" defaultValue={a.id} />
                 <input name="title" defaultValue={a.title} required />
                 <input name="slug" defaultValue={a.slug} required />
 
                 <label className="checkbox">
-                    <input type="checkbox" name="published" defaultChecked={a.published} /> Опубликована
+                    <input type="checkbox" name="published" defaultChecked={a.published} /> Published
                 </label>
 
                 <fieldset>
-                    <legend>Категории</legend>
+                    <legend>Categories</legend>
                     <div className="checkbox-list">
                         {categories.map((c: any) => (
                             <label key={c.id} className="checkbox">
@@ -64,7 +64,7 @@ export default async function EditArticle({
                 </fieldset>
 
                 <textarea name="bodyMd" rows={14} defaultValue={a.bodyMd} required />
-                <button className="primary__btn">Сохранить</button>
+                <button className="primary__btn">Save</button>
             </form>
         </div>
     );

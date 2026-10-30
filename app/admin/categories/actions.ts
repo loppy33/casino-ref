@@ -1,4 +1,5 @@
 "use server";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -18,15 +19,16 @@ const toSlug = (v: unknown) => {
 
 const categorySchema = z.object({
   id: z.string().optional(),
-  name: z.string().trim().min(2, "Название слишком короткое"),
+  name: z.string().trim().min(2, "Name is too short"),
   slug: z.preprocess(
     toSlug,
-    z.string().min(2, "slug слишком короткий").regex(/^[a-z0-9-]+$/)
+    z.string().min(2, "Slug is too short").regex(/^[a-z0-9-]+$/)
   ),
   parentId: z.preprocess(emptyToNull, z.string().nullable().optional()),
 });
 
 export async function createCategory(fd: FormData) {
+  await requireAdmin();
   const parsed = categorySchema.safeParse({
     name: fd.get("name"),
     slug: fd.get("slug"),
@@ -49,6 +51,7 @@ export async function createCategory(fd: FormData) {
 }
 
 export async function updateCategory(fd: FormData) {
+  await requireAdmin();
   const parsed = categorySchema.safeParse({
     id: fd.get("id"),
     name: fd.get("name"),
@@ -75,6 +78,7 @@ export async function updateCategory(fd: FormData) {
 }
 
 export async function deleteCategory(id: string) {
+  await requireAdmin();
   await prisma.category.delete({ where: { id } });
   revalidatePath("/admin/categories");
 }
