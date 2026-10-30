@@ -1,4 +1,4 @@
-// Переменные (если не подтянулись глобально)
+@use "sass:color"
 $primary: #0075ff
 $text-white: #ffffff
 $text-sec: #9ca3af
@@ -104,5 +104,5 @@ $text-sec: #9ca3af
                 border-bottom: 1px dashed rgba(0, 117, 255, 0.3)
                 transition: 0.2s
                 &:hover
-                    color: lighten($primary, 10%)
+                    color: color.adjust($primary, $lightness: 10%)
                     border-bottom-color: $primary

@@ -2,7 +2,13 @@
 
 A full-stack, SEO-oriented platform for casino reviews, categories and articles, with an admin panel and an **affiliate click tracker** (`/out/:linkId` redirect with sub-ID templating and click logging).
 
+<<<<<<< HEAD
 > All casinos, bonuses and affiliate URLs in the demo data are **fictional** (`example.com`).
+=======
+<!-- Обновление бд -->
+Это все делает, дальше ниже вроде не надо
+npx prisma db push
+>>>>>>> ea3dfa20dcb793736bddf98b0a741b6da5daff35
 
 ![Home](docs/screenshots/home.png)
 
@@ -45,7 +51,7 @@ More: [login](docs/screenshots/login.png) · [articles](docs/screenshots/article
 ```mermaid
 flowchart LR
     V[Visitor] -->|SSR / ISR| S[Next.js App Router<br/>public pages]
-    V -->|click "Play now"| O["/out/:linkId<br/>route handler"]
+    V -->|click Play now| O["/out/linkId<br/>route handler"]
     O -->|log click| DB[(PostgreSQL)]
     O -->|302 + sub-IDs| P[Affiliate partner]
     S -->|Prisma| DB
@@ -57,34 +63,64 @@ flowchart LR
 
 ```mermaid
 erDiagram
-    User { string id PK
-           string email UK
-           string password
-           Role role }
-    Category ||--o{ Category : "parent / children"
+    User {
+        string id PK
+        string email UK
+        string password
+        string role
+    }
+    Category {
+        string id PK
+        string slug UK
+        string name
+        string parentId FK
+    }
+    Casino {
+        string id PK
+        string slug UK
+        string name
+        int rating
+        string license
+        int minDeposit
+        string pros
+        string cons
+    }
+    AffiliateLink {
+        string id PK
+        string casinoId FK
+        string network
+        string baseUrl
+        string subTemplate
+        boolean isPrimary
+    }
+    Bonus {
+        string id PK
+        string casinoId FK
+        string name
+        string promocode
+    }
+    Article {
+        string id PK
+        string slug UK
+        string title
+        string bodyMd
+        boolean published
+    }
+    Click {
+        string id PK
+        string casinoId FK
+        string linkId FK
+        string source
+        string gclid
+        string ipHash
+    }
+    Category ||--o{ Category : "parent-children"
     Category }o--o{ Casino : "CasinoCategories"
     Category }o--o{ Article : "ArticleCategories"
     Casino ||--o{ AffiliateLink : has
     Casino ||--o{ Bonus : has
     Casino ||--o{ Click : receives
     AffiliateLink ||--o{ Click : tracks
-    Casino { string slug UK
-             int rating
-             string license
-             int minDeposit
-             string[] pros
-             string[] cons }
-    AffiliateLink { string network
-                    string baseUrl
-                    string subTemplate
-                    bool isPrimary }
-    Click { string id PK
-            string source
-            string gclid
-            string ipHash }
-    Article { string slug UK
-              string bodyMd
-              bool published }
 ```
 
 ### Click tracking flow
@@ -92,14 +128,14 @@ erDiagram
 ```mermaid
 sequenceDiagram
     participant U as Visitor
-    participant N as /out/[id]
+    participant N as out route
     participant D as PostgreSQL
     participant P as Partner
-    U->>N: GET /out/{linkId}?source=seo&gclid=...
+    U->>N: GET /out/linkId with source and gclid params
     N->>D: find AffiliateLink + Casino
     N->>N: clickId = uuid, build URL from subTemplate
     N->>D: INSERT Click (ipHash, UA, gclid, source)
-    N-->>U: 302 Location: partner URL with s1={clickId}
+    N-->>U: 302 to partner URL with clickId as sub-ID
     U->>P: follows redirect
 ```
 

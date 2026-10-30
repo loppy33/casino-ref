@@ -173,7 +173,10 @@ export default async function CategoryPage(props: { params: ParamsP }) {
                                         </h3>
                                         {/* Используем компонент Stars вместо ручного SVG */}
                                         <div className="casino-card__rating">
-                                            <Stars rating100={c.rating ?? 0} />
+                                            <Stars
+                                                value={c.rating ?? 0}
+                                                id={c.id}
+                                            />
                                         </div>
                                     </div>
 
